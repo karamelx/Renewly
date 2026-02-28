@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Renewly</title>
+<title>License Manager</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -264,8 +264,8 @@
 
 <nav class="topnav">
   <div class="nav-brand">
-    <div class="nav-logo">R</div>
-    <span class="nav-title">Renewly</span>
+    <div class="nav-logo">LM</div>
+    <span class="nav-title">License Manager</span>
   </div>
   <div class="nav-right">
     <span class="nav-date" id="nav-date"></span>
@@ -277,7 +277,7 @@
 
   <div class="page-header">
     <div>
-      <h1>Your <span>Renewly</span></h1>
+      <h1>License <span>Renewals</span></h1>
       <p class="page-subtitle">Track, manage, and get reminded before licenses expire.</p>
     </div>
   </div>
@@ -444,9 +444,11 @@
 
   async function loadData() {
     toast('Loading…');
-    // Load licenses
+    // Load licenses — filter out empty/phantom docs
     const snap = await getDocs(collection(db, 'licenses'));
-    licenses = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    licenses = snap.docs
+      .map(d => ({id: d.id, ...d.data()}))
+      .filter(l => l.name); // only keep docs that have actual data
 
     // Load settings
     const sSnap = await getDoc(doc(db, 'settings', 'global'));
@@ -458,7 +460,12 @@
       });
     }
 
+    // Only seed if truly no real licenses exist
     if (!licenses.length) {
+      // Clean up any phantom empty docs first
+      for (const d of snap.docs) {
+        if (!d.data().name) await deleteDoc(doc(db, 'licenses', d.id));
+      }
       // Seed with demo data on first load
       const demos = [
         {id:uid(),name:'Adobe Creative Cloud',vendor:'Adobe Inc.',category:'SaaS',expiry:offset(5),cost:'$599 / yr',notes:'5 seats — design team',reminders:[60,30,7]},
