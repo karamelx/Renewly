@@ -447,7 +447,7 @@
     // Load licenses — filter out empty/phantom docs
     const snap = await getDocs(collection(db, 'licenses'));
     licenses = snap.docs
-      .map(d => ({id: d.id, ...d.data()}))
+      .map(d => { const data = d.data(); data.id = d.id; return data; })
       .filter(l => l.name); // only keep docs that have actual data
 
     // Load settings
@@ -570,9 +570,15 @@
   window._closeModal   = ()   => { document.getElementById('del-modal').classList.remove('open'); delTarget=null; };
 
   window._confirmDelete = async () => {
-    await deleteLicense(delTarget);
-    licenses = licenses.filter(l=>l.id!==delTarget);
-    render(); window._closeModal(); toast('Entry removed.');
+    try {
+      toast('Deleting…');
+      await deleteDoc(doc(db, 'licenses', delTarget));
+      licenses = licenses.filter(l=>l.id!==delTarget);
+      render(); window._closeModal(); toast('Entry removed.');
+    } catch(e) {
+      toast('Delete error: ' + e.message);
+      console.error('Delete failed:', e);
+    }
   };
 
   window._saveSettings = saveSettings;
