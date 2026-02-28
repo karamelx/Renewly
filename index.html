@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Renewly</title>
+<title>License Manager</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -264,12 +264,12 @@
 
 <nav class="topnav">
   <div class="nav-brand">
-    <div class="nav-logo">R</div>
-    <span class="nav-title">Renewly</span>
+    <div class="nav-logo">LM</div>
+    <span class="nav-title">License Manager</span>
   </div>
   <div class="nav-right">
     <span class="nav-date" id="nav-date"></span>
-    <button class="btn btn-primary btn-sm" onclick="toggleForm()">+ Add License</button>
+    <button class="btn btn-primary btn-sm" onclick="_toggleForm()">+ Add License</button>
   </div>
 </nav>
 
@@ -277,7 +277,7 @@
 
   <div class="page-header">
     <div>
-      <h1>Your <span>Renewly</span></h1>
+      <h1>License <span>Renewals</span></h1>
       <p class="page-subtitle">Track, manage, and get reminded before licenses expire.</p>
     </div>
   </div>
@@ -341,8 +341,8 @@
       </div>
       <div class="field" style="margin-bottom:22px;"><label>Internal Notes</label><input id="f-notes" placeholder="Seat count, account owner, renewal contact…"></div>
       <div class="form-actions">
-        <button class="btn btn-primary" onclick="addLicense()">Save Entry</button>
-        <button class="btn btn-ghost" onclick="toggleForm()">Discard</button>
+        <button class="btn btn-primary" onclick="_addLicense()">Save Entry</button>
+        <button class="btn btn-ghost" onclick="_toggleForm()">Discard</button>
       </div>
     </div>
   </div>
@@ -369,7 +369,7 @@
             <h4>Recipient Email</h4>
             <p>Reminders will be sent to this address via your default email client.</p>
           </div>
-          <div class="field"><input type="email" id="s-email" placeholder="you@company.com" oninput="saveSettings()"></div>
+          <div class="field"><input type="email" id="s-email" placeholder="you@company.com" oninput="_saveSettings()"></div>
         </div>
         <div class="settings-block">
           <div>
@@ -389,11 +389,11 @@
       </div>
     </div>
     <div class="action-row">
-      <button class="btn btn-primary" onclick="sendAll()">Send Reminders</button>
+      <button class="btn btn-primary" onclick="_sendAll()">Send Reminders</button>
       <div class="divider"></div>
-      <button class="text-link" onclick="exportData()">Export JSON</button>
+      <button class="text-link" onclick="_exportData()">Export JSON</button>
       <button class="text-link" onclick="document.getElementById('imp').click()">Import JSON</button>
-      <input type="file" id="imp" style="display:none" accept=".json" onchange="importData(event)">
+      <input type="file" id="imp" style="display:none" accept=".json" onchange="_importData(event)">
       <span class="action-row-note">Opens your email client with all due licenses pre-filled</span>
     </div>
   </div>
@@ -406,166 +406,246 @@
     <div class="modal-header"><h3>Remove License?</h3></div>
     <div class="modal-body">This entry will be permanently deleted. This action cannot be undone.</div>
     <div class="modal-footer">
-      <button class="btn btn-danger" onclick="confirmDelete()">Remove Entry</button>
-      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="_confirmDelete()">Remove Entry</button>
+      <button class="btn btn-ghost" onclick="_closeModal()">Cancel</button>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<script>
-let licenses = JSON.parse(localStorage.getItem('lm_lic') || '[]');
-let settings  = JSON.parse(localStorage.getItem('lm_set') || '{"email":"","intervals":[60,30,7]}');
-let delTarget = null;
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, doc, getDocs, setDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-window.addEventListener('DOMContentLoaded', () => {
-  const d = new Date();
-  document.getElementById('nav-date').textContent =
-    d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-  document.getElementById('s-email').value = settings.email || '';
-
-  document.querySelectorAll('#global-chips .chip').forEach(c => {
-    c.classList.toggle('on', settings.intervals.includes(+c.dataset.d));
-    c.onclick = () => { c.classList.toggle('on'); saveGlobalIntervals(); };
-  });
-  document.querySelectorAll('#form-chips .chip').forEach(c => { c.onclick = () => c.classList.toggle('on'); });
-
-  if (!licenses.length) {
-    licenses = [
-      {id:uid(),name:'Adobe Creative Cloud',vendor:'Adobe Inc.',category:'SaaS',expiry:offset(5),cost:'$599 / yr',notes:'5 seats — design team',reminders:[60,30,7]},
-      {id:uid(),name:'company.com',vendor:'GoDaddy',category:'Domain',expiry:offset(-3),cost:'$15 / yr',notes:'Auto-renew is OFF',reminders:[30,7,1]},
-      {id:uid(),name:'GitHub Enterprise',vendor:'GitHub',category:'SaaS',expiry:offset(45),cost:'$21 / user / mo',notes:'20 seats',reminders:[60,30,7]},
-      {id:uid(),name:'SSL Wildcard Certificate',vendor:'DigiCert',category:'SSL / Security',expiry:offset(120),cost:'$299 / yr',notes:'Covers *.company.com',reminders:[60,30,7]},
-    ];
-    save();
-  }
-  render();
-});
-
-function uid()      { return Date.now().toString(36)+Math.random().toString(36).slice(2); }
-function offset(d)  { const dt=new Date(); dt.setDate(dt.getDate()+d); return dt.toISOString().split('T')[0]; }
-function diff(exp)  { const n=new Date(); n.setHours(0,0,0,0); return Math.round((new Date(exp+'T00:00:00')-n)/86400000); }
-function save()     { localStorage.setItem('lm_lic', JSON.stringify(licenses)); }
-function saveSettings() { settings.email=document.getElementById('s-email').value; localStorage.setItem('lm_set',JSON.stringify(settings)); }
-function saveGlobalIntervals() { settings.intervals=[...document.querySelectorAll('#global-chips .chip.on')].map(c=>+c.dataset.d); localStorage.setItem('lm_set',JSON.stringify(settings)); }
-function toast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
-function esc(s)     { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function statusOf(days) {
-  if (days < 0)   return {row:'row-expired',  tag:'tag-expired',  label:'Expired',  dc:'c-danger', dtext:`${Math.abs(days)}d overdue`};
-  if (days <= 7)  return {row:'row-critical', tag:'tag-critical', label:'Critical', dc:'c-danger', dtext:`${days}d left`};
-  if (days <= 30) return {row:'row-warning',  tag:'tag-warning',  label:'Expiring', dc:'c-warn',   dtext:`${days}d left`};
-  return              {row:'',             tag:'tag-ok',       label:'Active',   dc:'c-ok',     dtext:`${days}d left`};
-}
-
-function render() {
-  const sorted = [...licenses].sort((a,b)=>diff(a.expiry)-diff(b.expiry));
-  const list   = document.getElementById('license-list');
-  if (!sorted.length) {
-    list.innerHTML = `<div class="table-empty"><div style="font-size:28px;opacity:.2;margin-bottom:8px">📋</div><p>No licenses tracked. Add your first entry above.</p></div>`;
-  } else {
-    list.innerHTML = sorted.map((lic,i) => {
-      const days=diff(lic.expiry), s=statusOf(days);
-      return `
-        <div class="table-row ${s.row}" style="animation-delay:${i*35}ms">
-          <div>
-            <div class="row-name">${esc(lic.name)}</div>
-            <div class="row-vendor">${esc(lic.vendor||'—')}${lic.notes?` · <span style="color:var(--faint)">${esc(lic.notes)}</span>`:''}</div>
-          </div>
-          <div class="row-cell">${esc(lic.category)}</div>
-          <div class="row-cell">${lic.expiry}</div>
-          <div class="row-cost">${esc(lic.cost||'—')}</div>
-          <div>
-            <span class="status-tag ${s.tag}"><span class="tag-dot"></span>${s.label}</span>
-            <div class="days-count ${s.dc}">${s.dtext}</div>
-          </div>
-          <div class="row-actions">
-            <button class="btn-icon" title="Send reminder" onclick="emailOne('${lic.id}')">✉</button>
-            <button class="btn-icon" title="Delete" onclick="promptDelete('${lic.id}')">✕</button>
-          </div>
-        </div>`;
-    }).join('');
-  }
-  document.getElementById('row-count').textContent = licenses.length ? `${licenses.length} entr${licenses.length===1?'y':'ies'}` : '';
-  document.getElementById('k-total').textContent   = licenses.length;
-  document.getElementById('k-expired').textContent = licenses.filter(l=>diff(l.expiry)<0).length;
-  document.getElementById('k-warn').textContent    = licenses.filter(l=>{const d=diff(l.expiry);return d>=0&&d<=30;}).length;
-  document.getElementById('k-ok').textContent      = licenses.filter(l=>diff(l.expiry)>30).length;
-}
-
-function toggleForm() { document.getElementById('add-form').classList.toggle('open'); }
-function addLicense() {
-  const name=document.getElementById('f-name').value.trim();
-  const expiry=document.getElementById('f-expiry').value;
-  if (!name||!expiry) { toast('License name and expiry date are required.'); return; }
-  licenses.push({
-    id:uid(), name,
-    vendor:   document.getElementById('f-vendor').value.trim(),
-    category: document.getElementById('f-cat').value,
-    expiry,
-    cost:     document.getElementById('f-cost').value.trim(),
-    notes:    document.getElementById('f-notes').value.trim(),
-    reminders:[...document.querySelectorAll('#form-chips .chip.on')].map(c=>+c.dataset.d)
-  });
-  save(); render();
-  ['f-name','f-vendor','f-expiry','f-cost','f-notes'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('add-form').classList.remove('open');
-  toast('License entry saved.');
-}
-
-function dueLicenses() {
-  return licenses.map(l=>({l,days:diff(l.expiry)}))
-    .filter(({l,days})=>days<0||(l.reminders||settings.intervals).some(r=>days<=r))
-    .sort((a,b)=>a.days-b.days);
-}
-function buildBody(items) {
-  let b=`LICENSE RENEWAL REMINDERS\n${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}\n${'─'.repeat(40)}\n\n`;
-  items.forEach(({l,days})=>{
-    b+=`${l.name.toUpperCase()}${l.vendor?' — '+l.vendor:''}\n`;
-    b+=days<0?`  EXPIRED — ${Math.abs(days)} day(s) ago\n`:`  Expires in ${days} day(s) (${l.expiry})\n`;
-    if(l.cost)  b+=`  Cost: ${l.cost}\n`;
-    if(l.notes) b+=`  Notes: ${l.notes}\n`;
-    b+='\n';
-  });
-  b+='─'.repeat(40)+'\nGenerated by License Manager';
-  return b;
-}
-function sendAll() {
-  const email=settings.email;
-  if (!email) { toast('Please enter your email address in Notification Settings.'); document.getElementById('s-email').focus(); return; }
-  const due=dueLicenses();
-  if (!due.length) { toast('No reminders are due at this time.'); return; }
-  window.open(`mailto:${email}?subject=${encodeURIComponent('License Reminders — '+due.length+' require attention')}&body=${encodeURIComponent(buildBody(due))}`);
-}
-function emailOne(id) {
-  const lic=licenses.find(l=>l.id===id); if(!lic) return;
-  if (!settings.email) { toast('Please enter your email address in Notification Settings.'); return; }
-  const days=diff(lic.expiry);
-  window.open(`mailto:${settings.email}?subject=${encodeURIComponent('License Reminder: '+lic.name)}&body=${encodeURIComponent(buildBody([{l:lic,days}]))}`);
-}
-function promptDelete(id) { delTarget=id; document.getElementById('del-modal').classList.add('open'); }
-function confirmDelete()  { licenses=licenses.filter(l=>l.id!==delTarget); save(); render(); closeModal(); toast('Entry removed.'); }
-function closeModal()     { document.getElementById('del-modal').classList.remove('open'); delTarget=null; }
-function exportData() {
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([JSON.stringify({licenses,settings},null,2)],{type:'application/json'}));
-  a.download=`license-manager-${new Date().toISOString().split('T')[0]}.json`;
-  a.click(); toast('Data exported.');
-}
-function importData(e) {
-  const file=e.target.files[0]; if(!file) return;
-  const r=new FileReader();
-  r.onload=ev=>{
-    try {
-      const d=JSON.parse(ev.target.result);
-      if(d.licenses) licenses=d.licenses;
-      if(d.settings) { settings=d.settings; document.getElementById('s-email').value=settings.email||''; }
-      save(); saveSettings(); render(); toast('Data imported successfully.');
-    } catch { toast('Unable to parse the selected file.'); }
+  const firebaseConfig = {
+    apiKey: "AIzaSyBxSpcb3DMtv7UWStqrxA9xULASE7eE_kI",
+    authDomain: "renewly-af1de.firebaseapp.com",
+    projectId: "renewly-af1de",
+    storageBucket: "renewly-af1de.firebasestorage.app",
+    messagingSenderId: "730729566841",
+    appId: "1:730729566841:web:7d45d0a548e4800b14faa8",
+    measurementId: "G-0TCBK03B6T"
   };
-  r.readAsText(file); e.target.value='';
-}
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  let licenses = [];
+  let settings = {email:'', intervals:[60,30,7]};
+  let delTarget = null;
+
+  function uid()     { return Date.now().toString(36)+Math.random().toString(36).slice(2); }
+  function offset(d) { const dt=new Date(); dt.setDate(dt.getDate()+d); return dt.toISOString().split('T')[0]; }
+  function diff(exp) { const n=new Date(); n.setHours(0,0,0,0); return Math.round((new Date(exp+'T00:00:00')-n)/86400000); }
+  function esc(s)    { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
+
+  async function loadData() {
+    toast('Loading…');
+    // Load licenses
+    const snap = await getDocs(collection(db, 'licenses'));
+    licenses = snap.docs.map(d => ({id: d.id, ...d.data()}));
+
+    // Load settings
+    const sSnap = await getDoc(doc(db, 'settings', 'global'));
+    if (sSnap.exists()) {
+      settings = sSnap.data();
+      document.getElementById('s-email').value = settings.email || '';
+      document.querySelectorAll('#global-chips .chip').forEach(c => {
+        c.classList.toggle('on', (settings.intervals||[]).includes(+c.dataset.d));
+      });
+    }
+
+    if (!licenses.length) {
+      // Seed with demo data on first load
+      const demos = [
+        {id:uid(),name:'Adobe Creative Cloud',vendor:'Adobe Inc.',category:'SaaS',expiry:offset(5),cost:'$599 / yr',notes:'5 seats — design team',reminders:[60,30,7]},
+        {id:uid(),name:'company.com',vendor:'GoDaddy',category:'Domain',expiry:offset(-3),cost:'$15 / yr',notes:'Auto-renew is OFF',reminders:[30,7,1]},
+        {id:uid(),name:'GitHub Enterprise',vendor:'GitHub',category:'SaaS',expiry:offset(45),cost:'$21 / user / mo',notes:'20 seats',reminders:[60,30,7]},
+        {id:uid(),name:'SSL Wildcard Certificate',vendor:'DigiCert',category:'SSL / Security',expiry:offset(120),cost:'$299 / yr',notes:'Covers *.company.com',reminders:[60,30,7]},
+      ];
+      for (const lic of demos) {
+        await setDoc(doc(db, 'licenses', lic.id), lic);
+      }
+      licenses = demos;
+    }
+    render();
+  }
+
+  async function saveLicense(lic) {
+    await setDoc(doc(db, 'licenses', lic.id), lic);
+  }
+
+  async function deleteLicense(id) {
+    await deleteDoc(doc(db, 'licenses', id));
+  }
+
+  async function saveSettings() {
+    settings.email = document.getElementById('s-email').value;
+    await setDoc(doc(db, 'settings', 'global'), settings);
+  }
+
+  async function saveGlobalIntervals() {
+    settings.intervals = [...document.querySelectorAll('#global-chips .chip.on')].map(c=>+c.dataset.d);
+    await setDoc(doc(db, 'settings', 'global'), settings);
+  }
+
+  function statusOf(days) {
+    if (days < 0)   return {row:'row-expired',  tag:'tag-expired',  label:'Expired',  dc:'c-danger', dtext:`${Math.abs(days)}d overdue`};
+    if (days <= 7)  return {row:'row-critical', tag:'tag-critical', label:'Critical', dc:'c-danger', dtext:`${days}d left`};
+    if (days <= 30) return {row:'row-warning',  tag:'tag-warning',  label:'Expiring', dc:'c-warn',   dtext:`${days}d left`};
+    return              {row:'',             tag:'tag-ok',       label:'Active',   dc:'c-ok',     dtext:`${days}d left`};
+  }
+
+  function render() {
+    const sorted = [...licenses].sort((a,b)=>diff(a.expiry)-diff(b.expiry));
+    const list   = document.getElementById('license-list');
+    if (!sorted.length) {
+      list.innerHTML = `<div class="table-empty"><div style="font-size:28px;opacity:.2;margin-bottom:8px">📋</div><p>No licenses tracked. Add your first entry above.</p></div>`;
+    } else {
+      list.innerHTML = sorted.map((lic,i) => {
+        const days=diff(lic.expiry), s=statusOf(days);
+        return `
+          <div class="table-row ${s.row}" style="animation-delay:${i*35}ms">
+            <div>
+              <div class="row-name">${esc(lic.name)}</div>
+              <div class="row-vendor">${esc(lic.vendor||'—')}${lic.notes?` · <span style="color:var(--faint)">${esc(lic.notes)}</span>`:''}</div>
+            </div>
+            <div class="row-cell">${esc(lic.category)}</div>
+            <div class="row-cell">${lic.expiry}</div>
+            <div class="row-cost">${esc(lic.cost||'—')}</div>
+            <div>
+              <span class="status-tag ${s.tag}"><span class="tag-dot"></span>${s.label}</span>
+              <div class="days-count ${s.dc}">${s.dtext}</div>
+            </div>
+            <div class="row-actions">
+              <button class="btn-icon" title="Send reminder" onclick="window._emailOne('${lic.id}')">✉</button>
+              <button class="btn-icon" title="Delete" onclick="window._promptDelete('${lic.id}')">✕</button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+    document.getElementById('row-count').textContent = licenses.length ? `${licenses.length} entr${licenses.length===1?'y':'ies'}` : '';
+    document.getElementById('k-total').textContent   = licenses.length;
+    document.getElementById('k-expired').textContent = licenses.filter(l=>diff(l.expiry)<0).length;
+    document.getElementById('k-warn').textContent    = licenses.filter(l=>{const d=diff(l.expiry);return d>=0&&d<=30;}).length;
+    document.getElementById('k-ok').textContent      = licenses.filter(l=>diff(l.expiry)>30).length;
+  }
+
+  // Expose functions to global scope for inline onclick handlers
+  window._toggleForm = () => document.getElementById('add-form').classList.toggle('open');
+
+  window._addLicense = async () => {
+    const name=document.getElementById('f-name').value.trim();
+    const expiry=document.getElementById('f-expiry').value;
+    if (!name||!expiry) { toast('License name and expiry date are required.'); return; }
+    const lic = {
+      id:uid(), name,
+      vendor:   document.getElementById('f-vendor').value.trim(),
+      category: document.getElementById('f-cat').value,
+      expiry,
+      cost:     document.getElementById('f-cost').value.trim(),
+      notes:    document.getElementById('f-notes').value.trim(),
+      reminders:[...document.querySelectorAll('#form-chips .chip.on')].map(c=>+c.dataset.d)
+    };
+    toast('Saving…');
+    await saveLicense(lic);
+    licenses.push(lic);
+    render();
+    ['f-name','f-vendor','f-expiry','f-cost','f-notes'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('add-form').classList.remove('open');
+    toast('License entry saved.');
+  };
+
+  window._promptDelete = (id) => { delTarget=id; document.getElementById('del-modal').classList.add('open'); };
+  window._closeModal   = ()   => { document.getElementById('del-modal').classList.remove('open'); delTarget=null; };
+
+  window._confirmDelete = async () => {
+    await deleteLicense(delTarget);
+    licenses = licenses.filter(l=>l.id!==delTarget);
+    render(); window._closeModal(); toast('Entry removed.');
+  };
+
+  window._saveSettings = saveSettings;
+  window._saveGlobalIntervals = saveGlobalIntervals;
+
+  function dueLicenses() {
+    return licenses.map(l=>({l,days:diff(l.expiry)}))
+      .filter(({l,days})=>days<0||(l.reminders||settings.intervals).some(r=>days<=r))
+      .sort((a,b)=>a.days-b.days);
+  }
+  function buildBody(items) {
+    let b=`LICENSE RENEWAL REMINDERS\n${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}\n${'─'.repeat(40)}\n\n`;
+    items.forEach(({l,days})=>{
+      b+=`${l.name.toUpperCase()}${l.vendor?' — '+l.vendor:''}\n`;
+      b+=days<0?`  EXPIRED — ${Math.abs(days)} day(s) ago\n`:`  Expires in ${days} day(s) (${l.expiry})\n`;
+      if(l.cost)  b+=`  Cost: ${l.cost}\n`;
+      if(l.notes) b+=`  Notes: ${l.notes}\n`;
+      b+='\n';
+    });
+    b+='─'.repeat(40)+'\nGenerated by Renewly';
+    return b;
+  }
+
+  window._sendAll = () => {
+    const email=settings.email;
+    if (!email) { toast('Please enter your email address in Notification Settings.'); document.getElementById('s-email').focus(); return; }
+    const due=dueLicenses();
+    if (!due.length) { toast('No reminders are due at this time.'); return; }
+    window.open(`mailto:${email}?subject=${encodeURIComponent('License Reminders — '+due.length+' require attention')}&body=${encodeURIComponent(buildBody(due))}`);
+  };
+
+  window._emailOne = (id) => {
+    const lic=licenses.find(l=>l.id===id); if(!lic) return;
+    if (!settings.email) { toast('Please enter your email address in Notification Settings.'); return; }
+    const days=diff(lic.expiry);
+    window.open(`mailto:${settings.email}?subject=${encodeURIComponent('License Reminder: '+lic.name)}&body=${encodeURIComponent(buildBody([{l:lic,days}]))}`);
+  };
+
+  window._exportData = () => {
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([JSON.stringify({licenses,settings},null,2)],{type:'application/json'}));
+    a.download=`renewly-${new Date().toISOString().split('T')[0]}.json`;
+    a.click(); toast('Data exported.');
+  };
+
+  window._importData = async (e) => {
+    const file=e.target.files[0]; if(!file) return;
+    const r=new FileReader();
+    r.onload=async ev=>{
+      try {
+        const d=JSON.parse(ev.target.result);
+        if(d.licenses) {
+          for (const lic of d.licenses) await saveLicense(lic);
+          licenses = d.licenses;
+        }
+        if(d.settings) {
+          settings=d.settings;
+          document.getElementById('s-email').value=settings.email||'';
+          await saveSettings();
+        }
+        render(); toast('Data imported successfully.');
+      } catch { toast('Unable to parse the selected file.'); }
+    };
+    r.readAsText(file); e.target.value='';
+  };
+
+  // Init
+  window.addEventListener('DOMContentLoaded', () => {
+    const d = new Date();
+    document.getElementById('nav-date').textContent =
+      d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+
+    document.querySelectorAll('#global-chips .chip').forEach(c => {
+      c.classList.toggle('on', settings.intervals.includes(+c.dataset.d));
+      c.onclick = () => { c.classList.toggle('on'); window._saveGlobalIntervals(); };
+    });
+    document.querySelectorAll('#form-chips .chip').forEach(c => { c.onclick = () => c.classList.toggle('on'); });
+
+    loadData();
+  });
 </script>
 </body>
 </html>
