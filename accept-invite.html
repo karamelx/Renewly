@@ -36,6 +36,11 @@
   .auth-tabs { display: flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
   .auth-tab { flex: 1; padding: 9px; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; border: none; background: transparent; cursor: pointer; color: var(--muted); transition: all 0.15s; }
   .auth-tab.active { background: var(--accent); color: #faf6ef; }
+  .auth-divider { text-align:center; font-size:11px; color:var(--faint); margin:16px 0; position:relative; }
+  .auth-divider::before,.auth-divider::after { content:''; position:absolute; top:50%; width:42%; height:1px; background:var(--border); }
+  .auth-divider::before { left:0; } .auth-divider::after { right:0; }
+  .btn-google { width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:11px 18px; border:1px solid var(--border); border-radius:7px; background:var(--surface2); font-family:'Outfit',sans-serif; font-size:13px; font-weight:500; color:var(--text); cursor:pointer; transition:all .15s; margin-top:10px; }
+  .btn-google:hover { border-color:var(--border2); background:var(--surface); }
   .error { background: rgba(158,61,58,0.06); border: 1px solid rgba(158,61,58,0.2); border-radius: 6px; padding: 10px 14px; font-size: 12px; color: var(--danger); margin-bottom: 16px; display: none; }
   .error.show { display: block; }
   .success-state { text-align: center; padding: 12px 0; }
@@ -95,6 +100,11 @@
       <div class="field"><label>Email</label><input type="email" id="auth-email" placeholder="you@company.com"></div>
       <div class="field" style="margin-bottom:24px"><label>Password</label><input type="password" id="auth-password" placeholder="••••••••"></div>
       <button class="btn btn-primary" id="submit-btn" onclick="submitAuth()">Sign In & Accept</button>
+      <div class="auth-divider">or</div>
+      <button class="btn-google" id="google-btn" onclick="signInWithGoogle()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/></svg>
+        Continue with Google
+      </button>
     </div>
 
     <!-- Success -->
@@ -109,7 +119,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBxSpcb3DMtv7UWStqrxA9xULASE7eE_kI",
@@ -123,6 +133,7 @@
   const app  = initializeApp(firebaseConfig);
   const db   = getFirestore(app);
   const auth = getAuth(app);
+  const googleProvider = new GoogleAuthProvider();
 
   const params = new URLSearchParams(window.location.search);
   const token  = params.get('token');
@@ -240,6 +251,25 @@
       await acceptInvite(user);
     }
   });
+
+  window.signInWithGoogle = async () => {
+    const btn = document.getElementById('google-btn');
+    btn.disabled = true; btn.style.opacity = '0.6';
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      // onAuthStateChanged will fire and call acceptInvite automatically
+      // but only if inviteData is already loaded — handle both cases
+      if (inviteData) {
+        await acceptInvite(result.user);
+      }
+      // else onAuthStateChanged handles it
+    } catch(e) {
+      btn.disabled = false; btn.style.opacity = '1';
+      if (e.code !== 'auth/popup-closed-by-user') {
+        showError('Google sign-in failed. Please try again.');
+      }
+    }
+  };
 
   loadInvite();
 </script>
