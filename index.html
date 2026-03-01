@@ -59,10 +59,28 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
 .topnav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px;background:var(--surface);border-bottom:1px solid var(--border);}
 .nav-brand{display:flex;align-items:center;}
 .nav-right{display:flex;align-items:center;gap:12px;}
-.nav-crumb{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);}
-.nav-crumb-sep{color:var(--faint);}
-.nav-crumb-vault{font-weight:600;color:var(--text);}
-.nav-user{font-size:12px;color:var(--muted);font-weight:400;}
+.nav-vault-label{font-size:12px;color:var(--muted);font-weight:500;display:none;}
+.nav-vault-label span{color:var(--text);font-weight:600;}
+
+/* USER MENU */
+.user-menu-wrap{position:relative;}
+.user-menu-btn{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;transition:all .15s;font-family:'Outfit',sans-serif;}
+.user-menu-btn:hover{border-color:var(--border2);background:var(--surface);}
+.user-avatar{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#faf6ef;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.user-menu-name{font-size:12px;font-weight:500;color:var(--text);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.user-menu-chevron{color:var(--faint);transition:transform .2s;}
+.user-menu-btn.open .user-menu-chevron{transform:rotate(180deg);}
+.user-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:240px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 28px rgba(30,26,20,.13);z-index:100;display:none;animation:rowIn .15s ease;overflow:hidden;}
+.user-dropdown.open{display:block;}
+.user-dropdown-header{padding:16px 16px 12px;border-bottom:1px solid var(--border);background:var(--surface2);}
+.user-dropdown-name{font-size:13px;font-weight:600;color:var(--text);}
+.user-dropdown-email{font-size:11px;color:var(--muted);margin-top:2px;word-break:break-all;}
+.user-dropdown-item{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:13px;color:var(--muted);cursor:pointer;transition:background .1s;border:none;background:transparent;width:100%;font-family:'Outfit',sans-serif;text-align:left;}
+.user-dropdown-item:hover{background:var(--surface2);color:var(--text);}
+.user-dropdown-item.danger{color:var(--danger);}
+.user-dropdown-item.danger:hover{background:rgba(158,61,58,.05);}
+.user-dropdown-divider{height:1px;background:var(--border);margin:4px 0;}
+.user-dropdown-icon{width:16px;text-align:center;font-size:14px;flex-shrink:0;}
 .nav-date{font-size:12px;color:var(--faint);}
 
 /* ── VAULT DASHBOARD ── */
@@ -252,8 +270,7 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
 .hidden{display:none!important;}
 
 /* BACK BUTTON */
-.btn-back{display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;}
-.btn-back:hover{color:var(--text);border-color:var(--border2);}
+
 
 /* VAULT NAME INPUT IN MODAL */
 .vault-color-grid{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
@@ -321,7 +338,7 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
 <!-- MAIN APP -->
 <div id="app-screen" class="hidden">
   <nav class="topnav">
-    <div class="nav-brand">
+    <div class="nav-brand" onclick="goToDashboard()" style="cursor:pointer;" title="Back to vaults">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 50" height="38" style="display:block">
         <g transform="translate(22,25)">
           <circle cx="0" cy="0" r="16" fill="none" stroke="#ddd5c4" stroke-width="1"/>
@@ -337,14 +354,27 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
       </svg>
     </div>
     <div class="nav-right">
-      <div class="nav-crumb" id="nav-crumb" style="display:none">
-        <button class="btn-back" onclick="goToDashboard()">← Vaults</button>
-        <span class="nav-crumb-sep">·</span>
-        <span class="nav-crumb-vault" id="nav-vault-name"></span>
-      </div>
       <span class="nav-date" id="nav-date"></span>
-      <span class="nav-user" id="nav-user"></span>
-      <button class="btn btn-ghost btn-sm" onclick="_signOut()">Sign Out</button>
+      <div class="nav-vault-label" id="nav-vault-label">In vault: <span id="nav-vault-name"></span></div>
+      <div class="user-menu-wrap" id="user-menu-wrap">
+        <button class="user-menu-btn" id="user-menu-btn" onclick="_toggleUserMenu()">
+          <div class="user-avatar" id="user-avatar">?</div>
+          <span class="user-menu-name" id="user-menu-name"></span>
+          <svg class="user-menu-chevron" viewBox="0 0 16 16" fill="none" width="12" height="12"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="user-dropdown" id="user-dropdown">
+          <div class="user-dropdown-header">
+            <div class="user-dropdown-name" id="dd-name"></div>
+            <div class="user-dropdown-email" id="dd-email"></div>
+          </div>
+          <div style="padding:4px 0">
+            <button class="user-dropdown-item" onclick="_openAccountModal()"><span class="user-dropdown-icon">👤</span> Account Details</button>
+            <button class="user-dropdown-item" onclick="_openResetPasswordModal()"><span class="user-dropdown-icon">🔑</span> Reset Password</button>
+            <div class="user-dropdown-divider"></div>
+            <button class="user-dropdown-item danger" onclick="_signOut()"><span class="user-dropdown-icon">↩</span> Sign Out</button>
+          </div>
+        </div>
+      </div>
     </div>
   </nav>
 
@@ -606,6 +636,50 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
   </div>
 </div>
 
+<!-- ACCOUNT MODAL -->
+<div class="overlay" id="account-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Account Details</h3>
+      <p style="font-size:13px;color:var(--muted);font-weight:300;margin-top:6px">Your re-newly account information.</p>
+    </div>
+    <div class="modal-body">
+      <div class="field" style="margin-bottom:14px">
+        <label>Display Name</label>
+        <input id="acc-name" placeholder="Your name">
+      </div>
+      <div class="field" style="margin-bottom:4px">
+        <label>Email Address</label>
+        <input id="acc-email" disabled style="opacity:.6;cursor:not-allowed;">
+      </div>
+      <p style="font-size:11px;color:var(--faint);margin-top:6px">Email address cannot be changed here.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="_saveAccountDetails()">Save Changes</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('account-modal').classList.remove('open')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESET PASSWORD MODAL -->
+<div class="overlay" id="reset-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Reset Password</h3>
+      <p style="font-size:13px;color:var(--muted);font-weight:300;margin-top:6px">We'll send a reset link to your email.</p>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:14px 16px;font-size:13px;color:var(--muted);">
+        A password reset email will be sent to <strong id="reset-email-display" style="color:var(--text)"></strong>.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" id="reset-send-btn" onclick="_sendPasswordReset()">Send Reset Email</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('reset-modal').classList.remove('open')">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -697,7 +771,12 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById('auth-screen').classList.add('hidden');
     document.getElementById('app-screen').classList.remove('hidden');
     hideLoader();
-    document.getElementById('nav-user').textContent = user.displayName || user.email;
+    const displayName = user.displayName || user.email;
+    const initials = (user.displayName || user.email || '?').slice(0,2).toUpperCase();
+    document.getElementById('user-menu-name').textContent = user.displayName || user.email.split('@')[0];
+    document.getElementById('user-avatar').textContent = initials;
+    document.getElementById('dd-name').textContent = user.displayName || user.email.split('@')[0];
+    document.getElementById('dd-email').textContent = user.email;
     const d = new Date();
     document.getElementById('nav-date').textContent = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
     document.querySelectorAll('#form-chips .chip').forEach(c => { c.onclick = () => c.classList.toggle('on'); });
@@ -712,6 +791,14 @@ onAuthStateChanged(auth, async (user) => {
     } catch(e) {}
 
     await loadDashboard();
+    // Restore vault from URL hash if present (e.g. after page refresh)
+    const hash = window.location.hash;
+    const vaultMatch = hash.match(/^#vault\/(.+)$/);
+    if (vaultMatch) {
+      const savedId = vaultMatch[1];
+      const found = [...myVaults, ...sharedVaults].find(v => v.id === savedId);
+      if (found) openVault(found.id, found.role);
+    }
   } else {
     currentUser = null;
     document.getElementById('auth-screen').classList.remove('hidden');
@@ -766,7 +853,7 @@ async function loadDashboard() {
 
 function renderDashboard() {
   showScreen('dashboard');
-  document.getElementById('nav-crumb').style.display = 'none';
+  document.getElementById('nav-vault-label').style.display = 'none';
   const grid = document.getElementById('vault-grid');
   const allVaults = [...myVaults, ...sharedVaults];
 
@@ -825,8 +912,8 @@ window.openVault = async (vaultId, role) => {
   licenses = [...vault.licenses];
   activeFilter = 'all'; searchQuery = '';
 
-  showScreen('vault');
-  document.getElementById('nav-crumb').style.display = 'flex';
+  showScreen('vault', vaultId);
+  document.getElementById('nav-vault-label').style.display = 'flex';
   document.getElementById('nav-vault-name').textContent = vault.name;
 
   // Vault title
@@ -871,12 +958,18 @@ window.openVault = async (vaultId, role) => {
 
 window.goToDashboard = async () => {
   currentVault = null; licenses = [];
+  history.replaceState(null, '', window.location.pathname);
   await loadDashboard();
 };
 
-function showScreen(name) {
+function showScreen(name, vaultId) {
   document.getElementById('dashboard-screen').classList.toggle('show', name==='dashboard');
   document.getElementById('vault-screen').classList.toggle('show', name==='vault');
+  if (name === 'vault' && vaultId) {
+    history.replaceState(null, '', `#vault/${vaultId}`);
+  } else {
+    history.replaceState(null, '', window.location.pathname);
+  }
 }
 
 // ── Create Vault ──────────────────────────────────────────────────────────
@@ -917,8 +1010,8 @@ window._confirmCreateVault = async () => {
     activeFilter = 'all'; searchQuery = '';
     settings = { email:'', intervals:[60,30,7] };
 
-    showScreen('vault');
-    document.getElementById('nav-crumb').style.display = 'flex';
+    showScreen('vault', vaultId);
+    document.getElementById('nav-vault-label').style.display = 'flex';
     document.getElementById('nav-vault-name').textContent = name;
     document.getElementById('vault-title').innerHTML = `<span>${esc(name)}</span>`;
     document.getElementById('vault-subtitle').textContent = vaultData.desc || 'Your personal vault';
@@ -1257,6 +1350,75 @@ window._removeMember = async (memberId) => {
     renderMembers();
     toast('Access revoked.');
   } catch(e) { toast('Error revoking access: ' + e.message); }
+};
+
+// ── User Menu ─────────────────────────────────────────────────────────────
+window._toggleUserMenu = () => {
+  document.getElementById('user-dropdown').classList.toggle('open');
+  document.getElementById('user-menu-btn').classList.toggle('open');
+};
+
+// Close on outside click
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('user-menu-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('user-dropdown')?.classList.remove('open');
+    document.getElementById('user-menu-btn')?.classList.remove('open');
+  }
+});
+
+// ── Account Details ───────────────────────────────────────────────────────
+window._openAccountModal = () => {
+  document.getElementById('user-dropdown').classList.remove('open');
+  document.getElementById('user-menu-btn').classList.remove('open');
+  document.getElementById('acc-name').value  = currentUser.displayName || '';
+  document.getElementById('acc-email').value = currentUser.email || '';
+  document.getElementById('account-modal').classList.add('open');
+};
+
+window._saveAccountDetails = async () => {
+  const name = document.getElementById('acc-name').value.trim();
+  try {
+    const { updateProfile } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+    await updateProfile(currentUser, { displayName: name });
+    // Update user doc in Firestore
+    await setDoc(doc(db, `users/${currentUser.uid}`), {
+      email: currentUser.email,
+      displayName: name,
+      createdAt: currentUser.metadata?.creationTime || new Date().toISOString()
+    }, { merge: true });
+    // Update navbar
+    document.getElementById('user-menu-name').textContent = name || currentUser.email.split('@')[0];
+    document.getElementById('user-avatar').textContent    = (name || currentUser.email).slice(0,2).toUpperCase();
+    document.getElementById('dd-name').textContent        = name || currentUser.email.split('@')[0];
+    document.getElementById('account-modal').classList.remove('open');
+    toast('Account updated.');
+  } catch(e) { toast('Error: ' + e.message); }
+};
+
+// ── Reset Password ────────────────────────────────────────────────────────
+window._openResetPasswordModal = () => {
+  document.getElementById('user-dropdown').classList.remove('open');
+  document.getElementById('user-menu-btn').classList.remove('open');
+  document.getElementById('reset-email-display').textContent = currentUser.email;
+  const btn = document.getElementById('reset-send-btn');
+  btn.disabled = false; btn.textContent = 'Send Reset Email';
+  document.getElementById('reset-modal').classList.add('open');
+};
+
+window._sendPasswordReset = async () => {
+  const btn = document.getElementById('reset-send-btn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    const { sendPasswordResetEmail } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+    await sendPasswordResetEmail(auth, currentUser.email);
+    btn.textContent = '✓ Email Sent!';
+    setTimeout(() => document.getElementById('reset-modal').classList.remove('open'), 1800);
+    toast('Password reset email sent.');
+  } catch(e) {
+    btn.disabled = false; btn.textContent = 'Send Reset Email';
+    toast('Error: ' + e.message);
+  }
 };
 
 // ── Auth enter key ────────────────────────────────────────────────────────
