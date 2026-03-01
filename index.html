@@ -739,34 +739,24 @@ async function loadDashboard() {
     } catch(e) {}
   }
 
-  // Check shared vaults (vaults where I'm a member)
+  // Load shared vaults from user's own sharedVaults subcollection (written on invite accept)
   try {
-    const allUsersSnap = await getDocs(collection(db, 'users'));
-    for (const userDoc of allUsersSnap.docs) {
-      const ownerId = userDoc.id;
-      if (ownerId === currentUser.uid) continue;
+    const sharedSnap = await getDocs(collection(db, `users/${currentUser.uid}/sharedVaults`));
+    for (const refDoc of sharedSnap.docs) {
+      const ref = refDoc.data();
       try {
-        const memberDoc = await getDoc(doc(db, `vaults`)); // we'll use the members subcollection on the vault
-        // Check all this owner's vaults
-        const ownerVaultsSnap = await getDocs(collection(db, `users/${ownerId}/vaults`));
-        for (const ovRef of ownerVaultsSnap.docs) {
-          try {
-            const memDoc = await getDoc(doc(db, `vaults/${ovRef.id}/members/${currentUser.uid}`));
-            if (!memDoc.exists() || memDoc.data().status !== 'active') continue;
-            const vDoc = await getDoc(doc(db, `vaults/${ovRef.id}`));
-            if (!vDoc.exists()) continue;
-            const licSnap = await getDocs(collection(db, `vaults/${ovRef.id}/licenses`));
-            const lics = licSnap.docs.map(d => ({id:d.id,...d.data()})).filter(l=>l.name);
-            const ownerData = userDoc.data();
-            sharedVaults.push({
-              ...vDoc.data(), id: ovRef.id,
-              ownerId, ownerName: ownerData.displayName||ownerData.email,
-              ownerEmail: ownerData.email,
-              role: memDoc.data().role,
-              licenses: lics
-            });
-          } catch(e) {}
-        }
+        const vDoc = await getDoc(doc(db, `vaults/${ref.vaultId}`));
+        if (!vDoc.exists()) continue;
+        const licSnap = await getDocs(collection(db, `vaults/${ref.vaultId}/licenses`));
+        const lics = licSnap.docs.map(d => ({id:d.id,...d.data()})).filter(l=>l.name);
+        sharedVaults.push({
+          ...vDoc.data(), id: ref.vaultId,
+          ownerId: ref.ownerId,
+          ownerName: ref.ownerName || ref.ownerEmail,
+          ownerEmail: ref.ownerEmail,
+          role: ref.role,
+          licenses: lics
+        });
       } catch(e) {}
     }
   } catch(e) {}
@@ -1251,9 +1241,22 @@ async function sendInviteEmail(toEmail, fromName, vaultName, role, acceptUrl) {
 
 window._removeMember = async (memberId) => {
   if (!confirm("Revoke this member's access?")) return;
-  await deleteDoc(doc(db,`vaults/${currentVault.id}/members/${memberId}`));
-  members=members.filter(m=>m.id!==memberId);
-  renderMembers(); toast('Access revoked.');
+  try {
+    // Delete from vault members
+    await deleteDoc(doc(db,`vaults/${currentVault.id}/members/${memberId}`));
+
+    // For active members, the doc id IS their uid — clean up their sharedVaults ref too
+    const member = members.find(m => m.id === memberId);
+    if (member && member.status === 'active') {
+      try {
+        await deleteDoc(doc(db,`users/${memberId}/sharedVaults/${currentVault.id}`));
+      } catch(e) {} // best effort — rules may not allow owner to delete from user's space
+    }
+
+    members = members.filter(m => m.id !== memberId);
+    renderMembers();
+    toast('Access revoked.');
+  } catch(e) { toast('Error revoking access: ' + e.message); }
 };
 
 // ── Auth enter key ────────────────────────────────────────────────────────

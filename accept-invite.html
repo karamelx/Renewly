@@ -198,7 +198,7 @@
 
   async function acceptInvite(user) {
     try {
-      // Write active member to vault
+      // 1. Write active member doc to the vault
       await setDoc(doc(db, `vaults/${inviteData.vaultId}/members/${user.uid}`), {
         email: user.email,
         role: inviteData.role,
@@ -207,7 +207,18 @@
         acceptedAt: new Date().toISOString()
       });
 
-      // Remove the pending entry (keyed by memberId)
+      // 2. Store a reference on the invited user's own profile so dashboard can find it
+      await setDoc(doc(db, `users/${user.uid}/sharedVaults/${inviteData.vaultId}`), {
+        vaultId: inviteData.vaultId,
+        vaultName: inviteData.vaultName || '',
+        ownerId: inviteData.ownerId,
+        ownerName: inviteData.ownerName || '',
+        ownerEmail: inviteData.ownerEmail || '',
+        role: inviteData.role,
+        acceptedAt: new Date().toISOString()
+      });
+
+      // 3. Remove the pending entry (keyed by memberId)
       if (inviteData.memberId && inviteData.memberId !== user.uid) {
         try {
           const { deleteDoc: dd } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
@@ -218,7 +229,7 @@
       show('success-state');
       setTimeout(() => { window.location.href = '/'; }, 2200);
     } catch(e) {
-      showError('Could not activate your access. Please try again.');
+      showError('Could not activate your access: ' + e.message);
       document.getElementById('submit-btn').disabled = false;
     }
   }
