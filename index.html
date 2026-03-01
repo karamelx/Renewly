@@ -460,23 +460,9 @@
       });
     }
 
-    // Only seed if truly no real licenses exist
-    if (!licenses.length) {
-      // Clean up any phantom empty docs first
-      for (const d of snap.docs) {
-        if (!d.data().name) await deleteDoc(doc(db, 'licenses', d.id));
-      }
-      // Seed with demo data on first load
-      const demos = [
-        {id:uid(),name:'Adobe Creative Cloud',vendor:'Adobe Inc.',category:'SaaS',expiry:offset(5),cost:'$599 / yr',notes:'5 seats — design team',reminders:[60,30,7]},
-        {id:uid(),name:'company.com',vendor:'GoDaddy',category:'Domain',expiry:offset(-3),cost:'$15 / yr',notes:'Auto-renew is OFF',reminders:[30,7,1]},
-        {id:uid(),name:'GitHub Enterprise',vendor:'GitHub',category:'SaaS',expiry:offset(45),cost:'$21 / user / mo',notes:'20 seats',reminders:[60,30,7]},
-        {id:uid(),name:'SSL Wildcard Certificate',vendor:'DigiCert',category:'SSL / Security',expiry:offset(120),cost:'$299 / yr',notes:'Covers *.company.com',reminders:[60,30,7]},
-      ];
-      for (const lic of demos) {
-        await setDoc(doc(db, 'licenses', lic.id), lic);
-      }
-      licenses = demos;
+    // Clean up any phantom empty docs
+    for (const d of snap.docs) {
+      if (!d.data().name) await deleteDoc(doc(db, 'licenses', d.id));
     }
     render();
   }
