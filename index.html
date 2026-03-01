@@ -182,8 +182,8 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
 
 /* TABLE */
 .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:24px;}
-.table-head{display:grid;grid-template-columns:32px 2fr .8fr 1fr .7fr .7fr 1.1fr 120px;padding:12px 20px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);}
-.table-row{display:grid;grid-template-columns:32px 2fr .8fr 1fr .7fr .7fr 1.1fr 120px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;transition:background .15s;animation:rowIn .25s ease both;}
+.table-head{display:grid;grid-template-columns:32px 2fr .8fr 1fr .7fr .7fr 1.1fr 230px;padding:12px 20px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);}
+.table-row{display:grid;grid-template-columns:32px 2fr .8fr 1fr .7fr .7fr 1.1fr 230px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;transition:background .15s;animation:rowIn .25s ease both;min-height:60px;}
 .table-row:last-child{border-bottom:none;}
 .table-row:hover{background:rgba(107,83,53,.025);}
 .table-row.row-selected{background:rgba(107,83,53,.06)!important;}
@@ -195,19 +195,23 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
 .row-vendor{font-size:11px;color:var(--muted);margin-top:2px;}
 .row-cell{font-size:13px;color:var(--muted);}
 .row-cost{font-size:13px;color:var(--text);font-weight:500;}
-.row-actions{display:flex;align-items:center;justify-content:flex-end;gap:5px;}
-.status-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;}
+.row-actions{display:flex;align-items:center;justify-content:flex-end;gap:4px;}
+.status-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;}
 .tag-ok{background:rgba(46,107,80,.08);color:var(--ok);}
 .tag-warning{background:rgba(158,106,42,.08);color:var(--warn);}
 .tag-critical,.tag-expired{background:rgba(158,61,58,.08);color:var(--danger);}
 .tag-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
-.days-count{font-size:11px;margin-top:3px;}
+.days-count{font-size:10px;font-weight:500;letter-spacing:.2px;padding-left:2px;}
+.status-cell{display:flex;flex-direction:column;align-items:flex-start;gap:5px;}
 .c-ok{color:var(--ok);} .c-warn{color:var(--warn);} .c-danger{color:var(--danger);}
 .table-empty{padding:48px;text-align:center;color:var(--faint);font-size:13px;}
-.btn-icon{width:28px;height:28px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
-.btn-icon:hover{border-color:var(--border2);color:var(--text);}
-.btn-renew{padding:6px 12px;border-radius:5px;border:1px solid var(--ok);background:rgba(46,107,80,.08);color:var(--ok);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.3px;white-space:nowrap;}
-.btn-renew:hover{background:rgba(46,107,80,.15);}
+.btn-icon{padding:6px 11px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;letter-spacing:.3px;white-space:nowrap;}
+.btn-icon:hover{border-color:var(--border2);color:var(--text);background:var(--surface2);}
+.btn-icon.btn-edit:hover{border-color:var(--accent);color:var(--accent);background:rgba(107,83,53,.06);}
+.btn-icon.btn-delete:hover{border-color:var(--danger);color:var(--danger);background:rgba(158,61,58,.06);}
+.btn-icon.btn-comment:hover{border-color:var(--faint);color:var(--text);background:var(--surface2);}
+.btn-renew{padding:6px 11px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.3px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;}
+.btn-renew:hover{border-color:var(--ok);color:var(--ok);background:rgba(46,107,80,.06);}
 .btn-renew.renewed{background:var(--ok);color:#fff;border-color:var(--ok);animation:renewPop .4s ease;}
 @keyframes renewPop{0%{transform:scale(1);}40%{transform:scale(1.12);}100%{transform:scale(1);}}
 
@@ -496,15 +500,15 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
     <div class="nav-brand" onclick="goToDashboard()" style="cursor:pointer;" title="Back to vaults">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 50" height="38" style="display:block">
         <g transform="translate(22,25)">
-          <circle cx="0" cy="0" r="16" fill="none" stroke="#ddd5c4" stroke-width="1"/>
-          <path d="M 0,-13 A 13,13 0 1,1 -9.2,9.2" fill="none" stroke="#6b5335" stroke-width="2" stroke-linecap="round"/>
-          <g transform="translate(-9.2,9.2) rotate(-40)"><polygon points="0,-4 -3,2.5 3,2.5" fill="#6b5335"/></g>
-          <circle cx="0" cy="-13" r="2" fill="#6b5335"/>
+          <circle cx="0" cy="0" r="16" fill="none" stroke="var(--border)" stroke-width="1"/>
+          <path d="M 0,-13 A 13,13 0 1,1 -9.2,9.2" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+          <g transform="translate(-9.2,9.2) rotate(-40)"><polygon points="0,-4 -3,2.5 3,2.5" fill="var(--accent)"/></g>
+          <circle cx="0" cy="-13" r="2" fill="var(--accent)"/>
         </g>
         <g transform="translate(46,0)">
-          <text font-family="'Playfair Display',Georgia,serif" font-size="26" font-weight="400" y="30"><tspan fill="#6b5335" font-style="italic">re-</tspan><tspan fill="#1e1a14">newly</tspan></text>
-          <line x1="1" y1="36" x2="194" y2="36" stroke="#ddd5c4" stroke-width="0.8"/>
-          <text x="2" y="47" font-family="'Outfit',sans-serif" font-size="8" font-weight="500" fill="#b8ad9e" letter-spacing="3.5">LICENSE TRACKER</text>
+          <text font-family="'Playfair Display',Georgia,serif" font-size="26" font-weight="400" y="30"><tspan fill="var(--accent)" font-style="italic">re-</tspan><tspan fill="var(--text)">newly</tspan></text>
+          <line x1="1" y1="36" x2="194" y2="36" stroke="var(--border)" stroke-width="0.8"/>
+          <text x="2" y="47" font-family="'Outfit',sans-serif" font-size="8" font-weight="500" fill="var(--faint)" letter-spacing="3.5">LICENSE TRACKER</text>
         </g>
       </svg>
     </div>
@@ -529,10 +533,10 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
           <div style="padding:4px 0">
             <button class="user-dropdown-item" onclick="_openAccountModal()"><span class="user-dropdown-icon">👤</span> Account Details</button>
             <button class="user-dropdown-item" onclick="_openResetPasswordModal()"><span class="user-dropdown-icon">🔑</span> Reset Password</button>
-            <button class="user-dropdown-item" onclick="_toggleDark()" style="justify-content:space-between">
+            <div class="user-dropdown-item" onclick="_toggleDark()" style="justify-content:space-between;cursor:pointer;">
               <span style="display:flex;align-items:center;gap:10px"><span class="user-dropdown-icon">🌙</span> Dark Mode</span>
-              <button class="dark-toggle" id="dark-toggle" onclick="event.stopPropagation();_toggleDark()"></button>
-            </button>
+              <div class="dark-toggle" id="dark-toggle"></div>
+            </div>
             <div class="user-dropdown-divider"></div>
             <button class="user-dropdown-item danger" onclick="_signOut()"><span class="user-dropdown-icon">↩</span> Sign Out</button>
           </div>
@@ -1444,14 +1448,15 @@ function render() {
         <div class="row-cell">${lic.expiry}</div>
         <div class="row-cost">${esc(lic.cost||'—')}</div>
         <div class="row-cell">${seats}</div>
-        <div><span class="status-tag ${s.tag}"><span class="tag-dot"></span>${s.label}</span><div class="days-count ${s.dc}">${s.dtext}</div></div>
+        <div class="status-cell"><span class="status-tag ${s.tag}"><span class="tag-dot"></span>${s.label}</span><span class="days-count ${s.dc}">${s.dtext}</span></div>
         <div class="row-actions">
-          <button class="btn-icon" title="Comments" onclick="window._openComments('${lic.id}')" style="position:relative">
-            💬${(lic.commentCount&&lic.commentCount>0)?`<span style='position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:var(--accent);color:#faf6ef;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;'>${lic.commentCount}</span>`:''}
+          <button class="btn-icon btn-comment" onclick="window._openComments('${lic.id}')">
+            <svg viewBox="0 0 14 14" fill="none" width="12" height="12"><path d="M7 1.5C3.96 1.5 1.5 3.52 1.5 6c0 .9.3 1.75.82 2.46L1.5 11l2.8-1.1A6.1 6.1 0 0 0 7 10.5c3.04 0 5.5-2.02 5.5-4.5S10.04 1.5 7 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+            ${(lic.commentCount&&lic.commentCount>0) ? `<span style="background:var(--accent);color:#faf6ef;border-radius:20px;padding:0 5px;font-size:9px;min-width:14px;text-align:center;">${lic.commentCount}</span>` : ''}
           </button>
           ${canEdit ? `<button class="btn-renew" onclick="window._promptRenew('${lic.id}')">↻ Renew</button>` : ''}
-          ${canEdit ? `<button class="btn-icon" title="Edit" onclick="window._promptEdit('${lic.id}')">✎</button>` : ''}
-          ${canEdit ? `<button class="btn-icon" title="Delete" onclick="window._promptDelete('${lic.id}')">✕</button>` : '<span style="font-size:11px;color:var(--faint)">View only</span>'}
+          ${canEdit ? `<button class="btn-icon btn-edit" onclick="window._promptEdit('${lic.id}')"><svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg> Edit</button>` : ''}
+          ${canEdit ? `<button class="btn-icon btn-delete" onclick="window._promptDelete('${lic.id}')"><svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M2 3.5h10M5.5 3.5V2.5h3v1M5 5.5v5M9 5.5v5M3.5 3.5l.5 8h6l.5-8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Delete</button>` : '<span style="font-size:11px;color:var(--faint);padding:0 8px;">View only</span>'}
         </div>
       </div>`;
     }).join('');
