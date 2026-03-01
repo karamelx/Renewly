@@ -1,37 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 90" width="340" height="90">
-  <defs>
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Outfit:wght@300;400;500&display=swap');
-    </style>
-  </defs>
-
-  <!-- Icon: elegant circular arc with arrow, left side -->
-  <g transform="translate(36, 45)">
-    <!-- Outer ring faint -->
-    <circle cx="0" cy="0" r="26" fill="none" stroke="#ddd5c4" stroke-width="1"/>
-    <!-- Main arc -->
-    <path d="M 0,-22 A 22,22 0 1,1 -15.5,15.5" fill="none" stroke="#6b5335" stroke-width="2.5" stroke-linecap="round"/>
-    <!-- Arrowhead at end of arc -->
-    <g transform="translate(-15.5,15.5) rotate(-40)">
-      <polygon points="0,-5 -4,3 4,3" fill="#6b5335"/>
-    </g>
-    <!-- Center dot -->
-    <circle cx="0" cy="0" r="3.5" fill="#6b5335" opacity="0.25"/>
-    <!-- Small tick at top -->
-    <circle cx="0" cy="-22" r="2.5" fill="#6b5335"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 50" width="300" height="50">
+  <!-- Icon -->
+  <g transform="translate(22,25)">
+    <circle cx="0" cy="0" r="16" fill="none" stroke="#ddd5c4" stroke-width="1"/>
+    <path d="M 0,-13 A 13,13 0 1,1 -9.2,9.2" fill="none" stroke="#6b5335" stroke-width="2" stroke-linecap="round"/>
+    <g transform="translate(-9.2,9.2) rotate(-40)"><polygon points="0,-4 -3,2.5 3,2.5" fill="#6b5335"/></g>
+    <circle cx="0" cy="-13" r="2" fill="#6b5335"/>
   </g>
-
-  <!-- Wordmark group, right of icon -->
-  <g transform="translate(76, 0)">
-    <!-- re-newly -->
-    <text font-family="'Playfair Display', Georgia, serif" font-size="36" font-weight="400" letter-spacing="-0.5" y="52">
+  <!-- Wordmark -->
+  <g transform="translate(46,0)">
+    <text font-family="'Playfair Display', Georgia, 'Times New Roman', serif" font-size="26" font-weight="400" y="30">
       <tspan fill="#6b5335" font-style="italic">re-</tspan><tspan fill="#1e1a14">newly</tspan>
     </text>
-
-    <!-- Thin divider line -->
-    <line x1="2" y1="62" x2="248" y2="62" stroke="#ddd5c4" stroke-width="0.8"/>
-
-    <!-- LICENSE TRACKER underneath -->
-    <text x="4" y="78" font-family="'Outfit', sans-serif" font-size="11" font-weight="500" fill="#b8ad9e" letter-spacing="4.5">LICENSE TRACKER</text>
+    <line x1="1" y1="36" x2="194" y2="36" stroke="#ddd5c4" stroke-width="0.8"/>
+    <text x="2" y="47" font-family="'Outfit', 'Helvetica Neue', Arial, sans-serif" font-size="8" font-weight="500" fill="#b8ad9e" letter-spacing="3.5">LICENSE TRACKER</text>
   </g>
 </svg>
