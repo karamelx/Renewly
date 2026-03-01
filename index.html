@@ -4,413 +4,301 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>re-newly</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%236b5335'/%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='rgba(255,255,255,0.2)' stroke-width='1'/%3E%3Cpath d='M 16,4 A 12,12 0 1,1 7.5,23.4' fill='none' stroke='%23faf6ef' stroke-width='2.2' stroke-linecap='round'/%3E%3Cg transform='translate(7.5,23.4) rotate(-40)'%3E%3Cpolygon points='0,-4 -3,2.5 3,2.5' fill='%23faf6ef'/%3E%3C/g%3E%3Ccircle cx='16' cy='4' r='2' fill='%23faf6ef'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%236b5335'/%3E%3Ctext x='3' y='25' font-family='Georgia,serif' font-size='23' font-style='italic' font-weight='400' fill='%23faf6ef' letter-spacing='-1'%3Ere%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:        #f2ece0;
-    --surface:   #faf6ef;
-    --surface2:  #f5f0e6;
-    --border:    #ddd5c4;
-    --border2:   #c9bfad;
-    --text:      #1e1a14;
-    --muted:     #8a7f72;
-    --faint:     #b8ad9e;
-    --accent:    #6b5335;
-    --accent-h:  #5a4429;
-    --danger:    #9e3d3a;
-    --warn:      #9e6a2a;
-    --ok:        #2e6b50;
-    --rule:      #d4c9b6;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Outfit', sans-serif;
-    font-weight: 400;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    font-size: 14px;
-    line-height: 1.5;
-  }
+:root {
+  --bg:#f2ece0; --surface:#faf6ef; --surface2:#f5f0e6;
+  --border:#ddd5c4; --border2:#c9bfad;
+  --text:#1e1a14; --muted:#8a7f72; --faint:#b8ad9e;
+  --accent:#6b5335; --accent-h:#5a4429;
+  --danger:#9e3d3a; --warn:#9e6a2a; --ok:#2e6b50;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;}
 
-  /* LOADING SCREEN */
-  .loading-screen {
-    position: fixed; inset: 0;
-    background: var(--bg);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 999;
-    transition: opacity 0.3s ease;
-  }
-  .loading-screen.fade-out { opacity: 0; pointer-events: none; }
-  .loading-spinner {
-    display: flex; flex-direction: column; align-items: center; gap: 16px;
-  }
-  .spinner-ring {
-    width: 36px; height: 36px;
-    border: 2.5px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .spinner-text { font-size: 12px; color: var(--faint); letter-spacing: 2px; text-transform: uppercase; font-weight: 500; }
+/* LOADING */
+.loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;transition:opacity .3s ease;}
+.loading-screen.fade-out{opacity:0;pointer-events:none;}
+.spinner-ring{width:36px;height:36px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+.spinner-text{font-size:12px;color:var(--faint);letter-spacing:2px;text-transform:uppercase;font-weight:500;}
+@keyframes spin{to{transform:rotate(360deg);}}
 
-  /* AUTH SCREEN */
-  .auth-screen {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-  }
-  .auth-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    width: 100%;
-    max-width: 420px;
-    overflow: hidden;
-  }
-  .auth-header {
-    padding: 36px 36px 28px;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface2);
-  }
-  .auth-logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px;
-  }
-  .auth-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 22px;
-    font-weight: 400;
-    color: var(--text);
-    margin-bottom: 6px;
-  }
-  .auth-subtitle { font-size: 13px; color: var(--muted); font-weight: 300; }
-  .auth-body { padding: 28px 36px 36px; }
-  .auth-tabs {
-    display: flex;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 24px;
-  }
-  .auth-tab {
-    flex: 1; padding: 9px; text-align: center;
-    font-size: 13px; font-weight: 500; cursor: pointer;
-    background: var(--bg); color: var(--muted);
-    border: none; font-family: 'Outfit', sans-serif;
-    transition: all 0.15s;
-  }
-  .auth-tab.active { background: var(--accent); color: #faf6ef; }
-  .auth-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
-  .auth-field label { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
-  .auth-field input {
-    font-family: 'Outfit', sans-serif; font-size: 13px;
-    background: var(--bg); border: 1px solid var(--border);
-    border-radius: 5px; padding: 10px 14px; color: var(--text);
-    outline: none; transition: border-color 0.15s;
-  }
-  .auth-field input:focus { border-color: var(--accent); }
-  .auth-field input::placeholder { color: var(--faint); }
-  .auth-btn {
-    width: 100%; padding: 11px; border-radius: 5px; border: none;
-    font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500;
-    cursor: pointer; transition: all 0.15s; margin-bottom: 10px;
-  }
-  .auth-btn-primary { background: var(--accent); color: #faf6ef; }
-  .auth-btn-primary:hover { background: var(--accent-h); }
-  .auth-btn-google {
-    background: var(--surface); color: var(--text);
-    border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-  }
-  .auth-btn-google:hover { border-color: var(--border2); background: var(--surface2); }
-  .auth-divider {
-    display: flex; align-items: center; gap: 12px;
-    margin: 16px 0; color: var(--faint); font-size: 12px;
-  }
-  .auth-divider::before, .auth-divider::after {
-    content: ''; flex: 1; height: 1px; background: var(--border);
-  }
-  .auth-error {
-    background: rgba(158,61,58,0.08); border: 1px solid rgba(158,61,58,0.2);
-    color: var(--danger); border-radius: 5px; padding: 10px 14px;
-    font-size: 12px; margin-bottom: 16px; display: none;
-  }
-  .auth-error.show { display: block; }
+/* AUTH */
+.auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;width:100%;max-width:420px;overflow:hidden;}
+.auth-header{padding:36px 36px 28px;text-align:center;border-bottom:1px solid var(--border);background:var(--surface2);}
+.auth-body{padding:28px 36px 36px;}
+.auth-tabs{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:20px;}
+.auth-tab{flex:1;padding:9px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;border:none;background:transparent;cursor:pointer;color:var(--muted);transition:all .15s;}
+.auth-tab.active{background:var(--accent);color:#faf6ef;}
+.auth-field{margin-bottom:16px;}
+.auth-field label{display:block;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.auth-field input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:6px;background:var(--bg);font-family:'Outfit',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .15s;}
+.auth-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(107,83,53,.08);}
+.auth-error{background:rgba(158,61,58,.06);border:1px solid rgba(158,61,58,.2);border-radius:6px;padding:10px 14px;font-size:12px;color:var(--danger);margin-bottom:16px;display:none;}
+.auth-error.show{display:block;}
+.auth-divider{text-align:center;font-size:11px;color:var(--faint);margin:16px 0;position:relative;}
+.auth-divider::before,.auth-divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--border);}
+.auth-divider::before{left:0;} .auth-divider::after{right:0;}
 
-  /* NAV */
-  .topnav {
-    background: var(--surface);
-    border-bottom: 1px solid var(--rule);
-    padding: 0 48px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 40;
-  }
-  .nav-brand { display: flex; align-items: center; gap: 10px; }
-  .nav-right { display: flex; align-items: center; gap: 8px; }
-  .nav-date { font-size: 12px; color: var(--muted); padding-right: 16px; border-right: 1px solid var(--border); margin-right: 4px; }
-  .nav-user { font-size: 12px; color: var(--muted); padding-right: 12px; border-right: 1px solid var(--border); margin-right: 4px; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* BUTTONS */
+.btn{padding:10px 18px;border-radius:6px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .15s;}
+.btn-primary{background:var(--accent);color:#faf6ef;border-color:var(--accent);}
+.btn-primary:hover{background:var(--accent-h);}
+.btn-ghost{background:transparent;color:var(--muted);border-color:var(--border);}
+.btn-ghost:hover{color:var(--text);border-color:var(--border2);}
+.btn-danger{background:rgba(158,61,58,.08);color:var(--danger);border-color:rgba(158,61,58,.3);}
+.btn-danger:hover{background:rgba(158,61,58,.15);}
+.btn-google{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 18px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:var(--text);cursor:pointer;transition:all .15s;}
+.btn-google:hover{border-color:var(--border2);}
+.btn-sm{padding:7px 14px;font-size:12px;}
+.btn-full{width:100%;}
 
-  /* LAYOUT */
-  .page { max-width: 1000px; margin: 0 auto; padding: 40px 48px 80px; }
+/* NAV */
+.topnav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px;background:var(--surface);border-bottom:1px solid var(--border);}
+.nav-brand{display:flex;align-items:center;}
+.nav-right{display:flex;align-items:center;gap:12px;}
+.nav-crumb{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);}
+.nav-crumb-sep{color:var(--faint);}
+.nav-crumb-vault{font-weight:600;color:var(--text);}
+.nav-user{font-size:12px;color:var(--muted);font-weight:400;}
+.nav-date{font-size:12px;color:var(--faint);}
 
-  /* PAGE HEADER */
-  .page-header {
-    display: flex; align-items: flex-end; justify-content: space-between;
-    margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--rule);
-  }
-  .page-header h1 {
-    font-family: 'Playfair Display', serif; font-weight: 400;
-    font-size: 28px; letter-spacing: -0.3px; line-height: 1.2;
-  }
-  .page-header h1 span { font-style: italic; color: var(--accent); }
-  .page-subtitle { font-size: 13px; color: var(--muted); margin-top: 4px; font-weight: 300; }
+/* ── VAULT DASHBOARD ── */
+#dashboard-screen{display:none;}
+#dashboard-screen.show{display:block;}
+.dash-page{max-width:1080px;margin:0 auto;padding:40px 32px 80px;}
+.dash-header{margin-bottom:36px;}
+.dash-header h1{font-family:'Playfair Display',serif;font-size:30px;font-weight:400;color:var(--text);}
+.dash-header h1 span{color:var(--accent);font-style:italic;}
+.dash-header p{font-size:13px;color:var(--muted);font-weight:300;margin-top:6px;}
+.vault-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;}
+.vault-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:24px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.vault-card:hover{border-color:var(--border2);box-shadow:0 4px 20px rgba(30,26,20,.08);transform:translateY(-2px);}
+.vault-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);opacity:0;transition:opacity .2s;}
+.vault-card:hover::before{opacity:1;}
+.vault-card.shared-card::before{background:var(--ok);}
+.vault-card.new-card{border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:160px;color:var(--muted);}
+.vault-card.new-card:hover{color:var(--accent);border-color:var(--accent);}
+.vault-card-icon{width:40px;height:40px;border-radius:8px;background:rgba(107,83,53,.1);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px;}
+.vault-card.shared-card .vault-card-icon{background:rgba(46,107,80,.1);}
+.vault-card-name{font-size:16px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.vault-card-meta{font-size:12px;color:var(--muted);}
+.vault-card-stats{display:flex;gap:16px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);}
+.vault-stat{font-size:11px;color:var(--faint);}
+.vault-stat strong{display:block;font-size:18px;font-weight:600;color:var(--text);margin-bottom:1px;}
+.vault-stat.stat-danger strong{color:var(--danger);}
+.vault-stat.stat-warn strong{color:var(--warn);}
+.vault-role-badge{position:absolute;top:14px;right:14px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;}
+.badge-owner{background:rgba(107,83,53,.1);color:var(--accent);}
+.badge-editor{background:rgba(46,107,80,.1);color:var(--ok);}
+.badge-viewer{background:rgba(184,173,158,.2);color:var(--muted);}
+.new-card-plus{width:44px;height:44px;border-radius:50%;border:2px dashed currentColor;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;}
+.new-card-label{font-size:13px;font-weight:500;}
 
-  /* KPIs */
-  .kpi-row {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 1px; background: var(--border);
-    border: 1px solid var(--border); border-radius: 8px;
-    overflow: hidden; margin-bottom: 36px;
-  }
-  .kpi { background: var(--surface); padding: 20px 24px; position: relative; }
-  .kpi-indicator { position: absolute; top: 0; left: 0; right: 0; height: 3px; }
-  .kpi-label { font-size: 11px; font-weight: 500; letter-spacing: 1.8px; text-transform: uppercase; color: var(--faint); margin-bottom: 8px; }
-  .kpi-value { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 400; line-height: 1; color: var(--text); }
-  .kpi-sub { font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 300; }
-  .kpi.kpi-danger .kpi-indicator { background: var(--danger); }
-  .kpi.kpi-warn   .kpi-indicator { background: var(--warn); }
-  .kpi.kpi-ok     .kpi-indicator { background: var(--ok); }
-  .kpi.kpi-danger .kpi-value { color: var(--danger); }
-  .kpi.kpi-warn   .kpi-value { color: var(--warn); }
-  .kpi.kpi-ok     .kpi-value { color: var(--ok); }
+/* ── VAULT VIEW ── */
+#vault-screen{display:none;}
+#vault-screen.show{display:block;}
+.page{max-width:1080px;margin:0 auto;padding:32px 32px 80px;}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;}
+.page-header h1{font-family:'Playfair Display',serif;font-size:28px;font-weight:400;}
+.page-header h1 span{color:var(--accent);font-style:italic;}
+.page-subtitle{font-size:13px;color:var(--muted);font-weight:300;margin-top:4px;}
+.btn-add-license{display:flex;align-items:center;gap:10px;padding:12px 24px;border-radius:7px;background:var(--accent);color:#faf6ef;border:none;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;cursor:pointer;letter-spacing:.3px;transition:all .2s;box-shadow:0 2px 8px rgba(107,83,53,.25);}
+.btn-add-license:hover{background:var(--accent-h);box-shadow:0 4px 16px rgba(107,83,53,.3);transform:translateY(-1px);}
+.btn-add-license:active{transform:translateY(0);}
+.btn-add-license:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.btn-add-icon{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 
-  /* TOOLBAR */
-  .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-  .toolbar-left { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--faint); }
+/* KPIs */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px 20px;position:relative;overflow:hidden;}
+.kpi-indicator{position:absolute;top:0;left:0;right:0;height:3px;background:var(--border);}
+.kpi-danger .kpi-indicator{background:var(--danger);}
+.kpi-warn .kpi-indicator{background:var(--warn);}
+.kpi-ok .kpi-indicator{background:var(--ok);}
+.kpi-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);margin-bottom:8px;}
+.kpi-value{font-size:32px;font-weight:600;color:var(--text);line-height:1;}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:4px;}
 
-  /* BUTTONS */
-  .btn {
-    font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500;
-    padding: 9px 20px; border-radius: 5px; border: none; cursor: pointer;
-    transition: all 0.15s; letter-spacing: 0.2px; white-space: nowrap;
-  }
-  .btn-primary { background: var(--accent); color: #faf6ef; }
-  .btn-primary:hover { background: var(--accent-h); }
-  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
-  .btn-ghost:hover { color: var(--text); border-color: var(--border2); }
-  .btn-danger { background: var(--danger); color: #fff; }
-  .btn-danger:hover { background: #8a3330; }
-  .btn-sm { padding: 7px 14px; font-size: 12px; }
-  .btn-icon {
-    width: 30px; height: 30px; padding: 0;
-    display: flex; align-items: center; justify-content: center;
-    background: transparent; border: 1px solid var(--border);
-    border-radius: 5px; cursor: pointer; font-size: 13px;
-    color: var(--muted); transition: all 0.15s;
-  }
-  .btn-icon:hover { border-color: var(--border2); background: var(--surface2); color: var(--text); }
+/* FORM */
+.form-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:24px;overflow:hidden;max-height:0;transition:max-height .4s ease,opacity .3s ease;opacity:0;}
+.form-panel.open{max-height:800px;opacity:1;}
+.form-panel-header{padding:16px 24px;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);border-bottom:1px solid var(--border);background:var(--surface2);}
+.form-body{padding:24px;}
+.form-grid{display:grid;gap:16px;margin-bottom:16px;}
+.fg-2{grid-template-columns:1fr 1fr;}
+.fg-3{grid-template-columns:1fr 1fr 1fr;}
+.field label{display:block;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.field input,.field select{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:5px;background:var(--bg);font-family:'Outfit',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .15s;}
+.field input:focus,.field select:focus{border-color:var(--accent);}
+.chips-group label{display:block;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+.chip{padding:6px 14px;border-radius:20px;border:1px solid var(--border);font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;background:var(--bg);}
+.chip.on{background:var(--accent);color:#faf6ef;border-color:var(--accent);}
+.form-actions{display:flex;gap:10px;}
 
-  /* TABLE */
-  .table-wrap {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; overflow: hidden; margin-bottom: 40px;
-  }
-  .table-head {
-    display: grid; grid-template-columns: 2.2fr 1fr 1.1fr 0.9fr 1.1fr 88px;
-    padding: 11px 20px; background: var(--surface2);
-    border-bottom: 1px solid var(--border);
-    font-size: 11px; font-weight: 600; letter-spacing: 1.6px;
-    text-transform: uppercase; color: var(--faint);
-  }
-  .table-row {
-    display: grid; grid-template-columns: 2.2fr 1fr 1.1fr 0.9fr 1.1fr 88px;
-    padding: 0 20px; border-bottom: 1px solid var(--border);
-    align-items: center; min-height: 60px; transition: background 0.1s;
-    animation: rowIn 0.25s ease both; position: relative;
-  }
-  .table-row:last-child { border-bottom: none; }
-  .table-row:hover { background: var(--surface2); }
-  .table-row.row-expired  { border-left: 3px solid var(--danger); padding-left: 17px; }
-  .table-row.row-critical { border-left: 3px solid var(--danger); padding-left: 17px; }
-  .table-row.row-warning  { border-left: 3px solid var(--warn);   padding-left: 17px; }
-  @keyframes rowIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.toolbar-left{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);}
+.toolbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.search-wrap{position:relative;display:flex;align-items:center;}
+.search-icon{position:absolute;left:11px;width:14px;height:14px;color:var(--faint);pointer-events:none;flex-shrink:0;}
+.search-input{padding:8px 14px 8px 32px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-family:'Outfit',sans-serif;font-size:12px;color:var(--text);outline:none;transition:border-color .15s,box-shadow .15s;width:240px;}
+.search-input::placeholder{color:var(--faint);}
+.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(107,83,53,.08);}
+.filter-group{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+.filter-btn{padding:7px 14px;border:none;border-right:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}
+.filter-btn:last-child{border-right:none;}
+.filter-btn:hover:not(.active){background:var(--surface2);color:var(--text);}
+.filter-btn.active{background:var(--accent);color:#faf6ef;}
+.row-count-badge{font-size:11px;color:var(--faint);font-weight:500;background:var(--surface2);border:1px solid var(--border);padding:4px 10px;border-radius:20px;white-space:nowrap;}
 
-  .row-name { font-weight: 500; font-size: 14px; line-height: 1.3; }
-  .row-vendor { font-size: 12px; color: var(--muted); font-weight: 300; margin-top: 2px; }
-  .row-cell { font-size: 13px; color: var(--muted); }
-  .row-cost { font-size: 13px; color: var(--text); font-weight: 300; }
-  .row-actions { display: flex; gap: 4px; justify-content: flex-end; }
+/* TABLE */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:24px;}
+.table-head{display:grid;grid-template-columns:2fr .8fr 1fr .7fr .7fr 1.1fr 120px;padding:12px 20px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);}
+.table-row{display:grid;grid-template-columns:2fr .8fr 1fr .7fr .7fr 1.1fr 120px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;transition:background .15s;animation:rowIn .25s ease both;}
+.table-row:last-child{border-bottom:none;}
+.table-row:hover{background:rgba(107,83,53,.025);}
+.row-expired{background:rgba(158,61,58,.03)!important;}
+.row-critical{background:rgba(158,61,58,.02)!important;}
+.row-warning{background:rgba(158,106,42,.02)!important;}
+@keyframes rowIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+.row-name{font-weight:600;font-size:13px;color:var(--text);}
+.row-vendor{font-size:11px;color:var(--muted);margin-top:2px;}
+.row-cell{font-size:13px;color:var(--muted);}
+.row-cost{font-size:13px;color:var(--text);font-weight:500;}
+.row-actions{display:flex;align-items:center;justify-content:flex-end;gap:5px;}
+.status-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;}
+.tag-ok{background:rgba(46,107,80,.08);color:var(--ok);}
+.tag-warning{background:rgba(158,106,42,.08);color:var(--warn);}
+.tag-critical,.tag-expired{background:rgba(158,61,58,.08);color:var(--danger);}
+.tag-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
+.days-count{font-size:11px;margin-top:3px;}
+.c-ok{color:var(--ok);} .c-warn{color:var(--warn);} .c-danger{color:var(--danger);}
+.table-empty{padding:48px;text-align:center;color:var(--faint);font-size:13px;}
+.btn-icon{width:28px;height:28px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.btn-icon:hover{border-color:var(--border2);color:var(--text);}
+.btn-renew{padding:6px 12px;border-radius:5px;border:1px solid var(--ok);background:rgba(46,107,80,.08);color:var(--ok);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.3px;white-space:nowrap;}
+.btn-renew:hover{background:rgba(46,107,80,.15);}
+.btn-renew.renewed{background:var(--ok);color:#fff;border-color:var(--ok);animation:renewPop .4s ease;}
+@keyframes renewPop{0%{transform:scale(1);}40%{transform:scale(1.12);}100%{transform:scale(1);}}
 
-  .status-tag {
-    display: inline-flex; align-items: center; gap: 5px;
-    font-size: 11px; font-weight: 600; letter-spacing: 1px;
-    text-transform: uppercase; padding: 4px 10px; border-radius: 3px;
-  }
-  .tag-expired  { background: rgba(158,61,58,0.1);  color: var(--danger); }
-  .tag-critical { background: rgba(158,61,58,0.08); color: var(--danger); }
-  .tag-warning  { background: rgba(158,106,42,0.1); color: var(--warn); }
-  .tag-ok       { background: rgba(46,107,80,0.08); color: var(--ok); }
-  .tag-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
-  .days-count { font-weight: 500; font-size: 11px; margin-top: 3px; }
-  .c-danger { color: var(--danger); }
-  .c-warn   { color: var(--warn); }
-  .c-ok     { color: var(--ok); }
+/* SETTINGS */
+.settings-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:visible;margin-bottom:24px;}
+.settings-panel-header{padding:14px 24px;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);border-bottom:1px solid var(--border);background:var(--surface2);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:space-between;}
+.settings-body{padding:24px;}
 
-  /* EMPTY */
-  .table-empty { padding: 64px 24px; text-align: center; color: var(--muted); }
-  .table-empty p { font-size: 14px; margin-top: 8px; font-weight: 300; }
+/* REMINDER DROPDOWN */
+.reminder-dropdown-wrap{position:relative;}
+.reminder-dropdown-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border:1px solid var(--border);border-radius:6px;background:var(--bg);font-family:'Outfit',sans-serif;font-size:13px;color:var(--text);cursor:pointer;transition:border-color .15s;text-align:left;}
+.reminder-dropdown-trigger:hover{border-color:var(--border2);}
+.reminder-dropdown-trigger.open{border-color:var(--accent);box-shadow:0 0 0 3px rgba(107,83,53,.08);}
+.reminder-dropdown-trigger.open #reminder-chevron{transform:rotate(180deg);}
+.reminder-dropdown-menu{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(30,26,20,.12);z-index:100;display:none;animation:rowIn .15s ease;}
+.reminder-dropdown-menu.open{display:block;}
+.reminder-dropdown-label{padding:10px 14px 8px;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);border-bottom:1px solid var(--border);}
+.reminder-option{display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:13px;color:var(--muted);cursor:pointer;transition:background .1s;user-select:none;}
+.reminder-option:hover{background:var(--surface2);color:var(--text);}
+.reminder-check{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;transition:all .15s;flex-shrink:0;background:var(--bg);}
+.reminder-check.active{background:var(--accent);border-color:var(--accent);color:#faf6ef;}
 
-  /* FORM PANEL */
-  .form-panel {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; margin-bottom: 36px; overflow: hidden; display: none;
-  }
-  .form-panel.open { display: block; animation: rowIn 0.2s ease; }
-  .form-panel-header {
-    padding: 14px 24px; background: var(--surface2);
-    border-bottom: 1px solid var(--border);
-    font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
-    text-transform: uppercase; color: var(--muted);
-  }
-  .form-body { padding: 24px; }
-  .form-grid { display: grid; gap: 18px; margin-bottom: 18px; }
-  .fg-3 { grid-template-columns: 1fr 1fr 1fr; }
-  .fg-2 { grid-template-columns: 1fr 1fr; }
-  .field { display: flex; flex-direction: column; gap: 6px; }
-  .field label { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
-  .field input, .field select {
-    font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 400;
-    background: var(--bg); border: 1px solid var(--border);
-    border-radius: 5px; padding: 10px 14px; color: var(--text);
-    outline: none; transition: border-color 0.15s; -webkit-appearance: none;
-  }
-  .field input:focus, .field select:focus { border-color: var(--accent); }
-  .field input::placeholder { color: var(--faint); }
+/* MEMBERS */
+.btn-invite{display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:5px;background:var(--accent);color:#faf6ef;border:none;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;cursor:pointer;letter-spacing:.3px;transition:background .15s;}
+.btn-invite:hover{background:var(--accent-h);}
+.members-empty{font-size:12px;color:var(--faint);text-align:center;padding:24px 0;font-style:italic;}
+.member-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.member-row:last-child{border-bottom:none;}
+.member-avatar{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#faf6ef;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;}
+.member-info{flex:1;min-width:0;}
+.member-email{font-size:13px;font-weight:500;color:var(--text);}
+.member-meta{font-size:11px;color:var(--faint);margin-top:1px;}
+.member-badge{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;}
+.badge-viewer{background:rgba(107,83,53,.1);color:var(--accent);}
+.badge-editor-m{background:rgba(46,107,80,.1);color:var(--ok);}
+.badge-pending{background:rgba(158,106,42,.1);color:var(--warn);}
+.member-remove{padding:4px 8px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--faint);font-size:11px;cursor:pointer;transition:all .15s;font-family:'Outfit',sans-serif;}
+.member-remove:hover{border-color:var(--danger);color:var(--danger);}
 
-  .chips-group { margin-bottom: 20px; }
-  .chips-group label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
-  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
-  .chip {
-    padding: 5px 14px; border-radius: 3px; border: 1px solid var(--border);
-    background: var(--bg); font-family: 'Outfit', sans-serif; font-size: 12px;
-    cursor: pointer; transition: all 0.12s; color: var(--muted); user-select: none;
-  }
-  .chip.on { border-color: var(--accent); background: rgba(107,83,53,0.09); color: var(--accent); font-weight: 500; }
-  .chip:hover:not(.on) { border-color: var(--border2); color: var(--text); }
-  .form-actions { display: flex; gap: 10px; padding-top: 4px; }
+/* ROLE SELECTOR */
+.role-selector{display:flex;flex-direction:column;gap:8px;}
+.role-option{display:flex;align-items:center;gap:14px;padding:12px 16px;border:1.5px solid var(--border);border-radius:7px;cursor:pointer;transition:all .15s;background:var(--bg);}
+.role-option:hover{border-color:var(--border2);}
+.role-option.active{border-color:var(--accent);background:rgba(107,83,53,.04);}
+.role-icon{font-size:18px;flex-shrink:0;width:28px;text-align:center;}
+.role-check{margin-left:auto;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;transition:all .15s;flex-shrink:0;}
+.role-option.active .role-check{background:var(--accent);border-color:var(--accent);color:#faf6ef;}
 
-  /* SETTINGS */
-  .settings-panel {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; overflow: hidden; margin-bottom: 40px;
-  }
-  .settings-panel-header {
-    padding: 14px 24px; background: var(--surface2); border-bottom: 1px solid var(--border);
-    font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted);
-  }
-  .settings-body { padding: 24px; }
-  .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
-  .settings-block { display: flex; flex-direction: column; gap: 14px; }
-  .settings-block h4 { font-size: 13px; font-weight: 600; color: var(--text); }
-  .settings-block p { font-size: 12px; color: var(--muted); font-weight: 300; margin-top: -6px; }
-  .action-row {
-    display: flex; align-items: center; gap: 10px;
-    padding: 16px 24px; border-top: 1px solid var(--border);
-    background: var(--surface2); flex-wrap: wrap;
-  }
-  .action-row-note { font-size: 12px; color: var(--faint); font-weight: 300; margin-left: 4px; }
-  .divider { width: 1px; height: 16px; background: var(--border); margin: 0 4px; }
-  .text-link {
-    background: none; border: none; font-family: 'Outfit', sans-serif;
-    font-size: 12px; color: var(--muted); cursor: pointer;
-    text-decoration: underline; text-underline-offset: 3px;
-    transition: color 0.15s; padding: 0;
-  }
-  .text-link:hover { color: var(--accent); }
+/* MODALS */
+.overlay{position:fixed;inset:0;background:rgba(30,26,20,.4);backdrop-filter:blur(2px);z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .2s;}
+.overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:10px;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(30,26,20,.2);transform:translateY(8px);transition:transform .2s;}
+.overlay.open .modal{transform:none;}
+.modal-header{padding:24px 24px 16px;}
+.modal-header h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;}
+.modal-body{padding:4px 24px 16px;}
+.modal-footer{padding:16px 24px 24px;display:flex;gap:10px;}
 
-  /* MODAL */
-  .overlay { position: fixed; inset: 0; background: rgba(30,26,20,0.4); z-index: 50; display: none; align-items: center; justify-content: center; }
-  .overlay.open { display: flex; }
-  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; width: 420px; max-width: 92vw; overflow: hidden; animation: rowIn 0.18s ease; }
-  .modal-header { padding: 20px 24px 12px; }
-  .modal h3 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 400; }
-  .modal-body { padding: 0 24px 4px; font-size: 13px; color: var(--muted); font-weight: 300; }
-  .modal-footer { display: flex; gap: 8px; padding: 16px 24px; border-top: 1px solid var(--border); margin-top: 16px; background: var(--surface2); }
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--text);color:#faf6ef;padding:10px 20px;border-radius:6px;font-size:13px;font-weight:500;z-index:500;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-  /* TOAST */
-  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: var(--surface); padding: 10px 18px; border-radius: 5px; font-size: 12px; font-weight: 500; z-index: 100; opacity: 0; transform: translateY(10px); transition: all 0.18s; pointer-events: none; }
-  .toast.show { opacity: 1; transform: translateY(0); }
+/* FOOTER */
+.footer{text-align:center;padding:24px;font-size:11px;color:var(--faint);border-top:1px solid var(--border);}
+.footer span{margin:0 6px;}
 
-  /* HIDDEN */
-  .hidden { display: none !important; }
+/* HIDDEN */
+.hidden{display:none!important;}
 
-  /* FOOTER */
-  .footer {
-    text-align: center;
-    padding: 24px 48px 40px;
-    font-size: 11px;
-    color: var(--faint);
-    font-weight: 300;
-    letter-spacing: 0.5px;
-  }
-  .footer span { color: var(--border2); margin: 0 6px; }
+/* BACK BUTTON */
+.btn-back{display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;}
+.btn-back:hover{color:var(--text);border-color:var(--border2);}
 
-  @media (max-width: 720px) {
-    .topnav { padding: 0 20px; }
-    .page { padding: 24px 20px 60px; }
-    .kpi-row { grid-template-columns: 1fr 1fr; }
-    .table-head > *:nth-child(2), .table-head > *:nth-child(3), .table-head > *:nth-child(4),
-    .table-row  > *:nth-child(2), .table-row  > *:nth-child(3), .table-row  > *:nth-child(4) { display: none; }
-    .table-head, .table-row { grid-template-columns: 1fr auto auto; }
-    .fg-3, .fg-2 { grid-template-columns: 1fr; }
-    .settings-grid { grid-template-columns: 1fr; }
-  }
+/* VAULT NAME INPUT IN MODAL */
+.vault-color-grid{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.vault-color-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;}
+.vault-color-swatch.selected{border-color:var(--text);transform:scale(1.15);}
+
+@media(max-width:768px){
+  .topnav{padding:0 16px;}
+  .page,.dash-page{padding:20px 16px 60px;}
+  .kpi-row{grid-template-columns:1fr 1fr;}
+  .table-head>*:nth-child(2),.table-head>*:nth-child(3),.table-head>*:nth-child(4),
+  .table-row>*:nth-child(2),.table-row>*:nth-child(3),.table-row>*:nth-child(4){display:none;}
+  .table-head,.table-row{grid-template-columns:1fr auto auto;}
+  .fg-3,.fg-2{grid-template-columns:1fr;}
+  .vault-grid{grid-template-columns:1fr;}
+}
 </style>
 </head>
 <body>
 
-<!-- LOADING SCREEN -->
+<!-- LOADING -->
 <div id="loading-screen" class="loading-screen">
-  <div class="loading-spinner">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
     <div class="spinner-ring"></div>
     <span class="spinner-text">Loading</span>
   </div>
 </div>
 
-<!-- AUTH SCREEN -->
+<!-- AUTH -->
 <div class="auth-screen hidden" id="auth-screen">
   <div class="auth-card">
     <div class="auth-header">
-      <div class="auth-logo">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 44" height="44">
-          <g transform="translate(20,22)">
-            <circle cx="0" cy="0" r="14" fill="none" stroke="#ddd5c4" stroke-width="1"/>
-            <path d="M 0,-11 A 11,11 0 1,1 -7.8,7.8" fill="none" stroke="#6b5335" stroke-width="2" stroke-linecap="round"/>
-            <g transform="translate(-7.8,7.8) rotate(-40)"><polygon points="0,-3.5 -2.5,2 2.5,2" fill="#6b5335"/></g>
-            <circle cx="0" cy="-11" r="1.8" fill="#6b5335"/>
-          </g>
-          <g transform="translate(42,0)">
-            <text font-family="'Playfair Display', Georgia, serif" font-size="28" font-weight="400" y="30">
-              <tspan fill="#6b5335" font-style="italic">re-</tspan><tspan fill="#1e1a14">newly</tspan>
-            </text>
-            <line x1="1" y1="36" x2="188" y2="36" stroke="#ddd5c4" stroke-width="0.8"/>
-            <text x="2" y="44" font-family="'Outfit', sans-serif" font-size="7.5" font-weight="500" fill="#b8ad9e" letter-spacing="3.5">LICENSE TRACKER</text>
-          </g>
-        </svg>
-      </div>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 44" height="44">
+        <g transform="translate(20,22)">
+          <circle cx="0" cy="0" r="14" fill="none" stroke="#ddd5c4" stroke-width="1"/>
+          <path d="M 0,-11 A 11,11 0 1,1 -7.8,7.8" fill="none" stroke="#6b5335" stroke-width="2" stroke-linecap="round"/>
+          <g transform="translate(-7.8,7.8) rotate(-40)"><polygon points="0,-3.5 -2.5,2 2.5,2" fill="#6b5335"/></g>
+          <circle cx="0" cy="-11" r="1.8" fill="#6b5335"/>
+        </g>
+        <g transform="translate(42,0)">
+          <text font-family="'Playfair Display',Georgia,serif" font-size="28" font-weight="400" y="30"><tspan fill="#6b5335" font-style="italic">re-</tspan><tspan fill="#1e1a14">newly</tspan></text>
+          <line x1="1" y1="36" x2="188" y2="36" stroke="#ddd5c4" stroke-width="0.8"/>
+          <text x="2" y="44" font-family="'Outfit',sans-serif" font-size="7.5" font-weight="500" fill="#b8ad9e" letter-spacing="3.5">LICENSE TRACKER</text>
+        </g>
+      </svg>
     </div>
     <div class="auth-body">
       <div class="auth-tabs">
@@ -418,17 +306,11 @@
         <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Create Account</button>
       </div>
       <div class="auth-error" id="auth-error"></div>
-      <div class="auth-field">
-        <label>Email</label>
-        <input type="email" id="auth-email" placeholder="you@company.com">
-      </div>
-      <div class="auth-field">
-        <label>Password</label>
-        <input type="password" id="auth-password" placeholder="••••••••">
-      </div>
-      <button class="auth-btn auth-btn-primary" id="auth-submit-btn" onclick="submitAuth()">Sign In</button>
+      <div class="auth-field"><label>Email</label><input type="email" id="auth-email" placeholder="you@company.com"></div>
+      <div class="auth-field"><label>Password</label><input type="password" id="auth-password" placeholder="••••••••"></div>
+      <button class="btn btn-primary btn-full" id="auth-submit-btn" onclick="submitAuth()">Sign In</button>
       <div class="auth-divider">or</div>
-      <button class="auth-btn auth-btn-google" onclick="signInWithGoogle()">
+      <button class="btn-google" onclick="signInWithGoogle()">
         <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/></svg>
         Continue with Google
       </button>
@@ -448,157 +330,263 @@
           <circle cx="0" cy="-13" r="2" fill="#6b5335"/>
         </g>
         <g transform="translate(46,0)">
-          <text font-family="'Playfair Display', Georgia, serif" font-size="26" font-weight="400" y="30">
-            <tspan fill="#6b5335" font-style="italic">re-</tspan><tspan fill="#1e1a14">newly</tspan>
-          </text>
+          <text font-family="'Playfair Display',Georgia,serif" font-size="26" font-weight="400" y="30"><tspan fill="#6b5335" font-style="italic">re-</tspan><tspan fill="#1e1a14">newly</tspan></text>
           <line x1="1" y1="36" x2="194" y2="36" stroke="#ddd5c4" stroke-width="0.8"/>
-          <text x="2" y="47" font-family="'Outfit', sans-serif" font-size="8" font-weight="500" fill="#b8ad9e" letter-spacing="3.5">LICENSE TRACKER</text>
+          <text x="2" y="47" font-family="'Outfit',sans-serif" font-size="8" font-weight="500" fill="#b8ad9e" letter-spacing="3.5">LICENSE TRACKER</text>
         </g>
       </svg>
     </div>
     <div class="nav-right">
+      <div class="nav-crumb" id="nav-crumb" style="display:none">
+        <button class="btn-back" onclick="goToDashboard()">← Vaults</button>
+        <span class="nav-crumb-sep">·</span>
+        <span class="nav-crumb-vault" id="nav-vault-name"></span>
+      </div>
       <span class="nav-date" id="nav-date"></span>
       <span class="nav-user" id="nav-user"></span>
       <button class="btn btn-ghost btn-sm" onclick="_signOut()">Sign Out</button>
-      <button class="btn btn-primary btn-sm" onclick="_toggleForm()">+ Add License</button>
     </div>
   </nav>
 
-  <div class="page">
-    <div class="page-header">
-      <div>
-        <h1>License <span>Renewals</span></h1>
-        <p class="page-subtitle">Track, manage, and get reminded before licenses expire.</p>
+  <!-- DASHBOARD SCREEN -->
+  <div id="dashboard-screen" class="show">
+    <div class="dash-page">
+      <div class="dash-header">
+        <h1>Your <span>Vaults</span></h1>
+        <p>Select a vault to manage licenses, or create a new one.</p>
       </div>
-    </div>
-
-    <div class="kpi-row">
-      <div class="kpi">
-        <div class="kpi-indicator"></div>
-        <div class="kpi-label">Total</div>
-        <div class="kpi-value" id="k-total">0</div>
-        <div class="kpi-sub">licenses tracked</div>
-      </div>
-      <div class="kpi kpi-danger">
-        <div class="kpi-indicator"></div>
-        <div class="kpi-label">Expired</div>
-        <div class="kpi-value" id="k-expired">0</div>
-        <div class="kpi-sub">action required</div>
-      </div>
-      <div class="kpi kpi-warn">
-        <div class="kpi-indicator"></div>
-        <div class="kpi-label">Expiring Soon</div>
-        <div class="kpi-value" id="k-warn">0</div>
-        <div class="kpi-sub">within 30 days</div>
-      </div>
-      <div class="kpi kpi-ok">
-        <div class="kpi-indicator"></div>
-        <div class="kpi-label">Active</div>
-        <div class="kpi-value" id="k-ok">0</div>
-        <div class="kpi-sub">in good standing</div>
-      </div>
-    </div>
-
-    <!-- FORM -->
-    <div class="form-panel" id="add-form">
-      <div class="form-panel-header">New License Entry</div>
-      <div class="form-body">
-        <div class="form-grid fg-3">
-          <div class="field"><label>License Name *</label><input id="f-name" placeholder="e.g. Adobe Creative Cloud"></div>
-          <div class="field"><label>Vendor</label><input id="f-vendor" placeholder="e.g. Adobe Inc."></div>
-          <div class="field"><label>Category</label>
-            <select id="f-cat">
-              <option>Software</option><option>SaaS</option><option>Domain</option>
-              <option>SSL / Security</option><option>Hardware</option><option>Other</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-grid fg-2">
-          <div class="field"><label>Expiration Date *</label><input type="date" id="f-expiry"></div>
-          <div class="field"><label>Annual Cost</label><input id="f-cost" placeholder="e.g. $299 / year"></div>
-        </div>
-        <div class="chips-group">
-          <label>Reminder Intervals (days before expiry)</label>
-          <div class="chips" id="form-chips">
-            <div class="chip" data-d="90">90 days</div>
-            <div class="chip on" data-d="60">60 days</div>
-            <div class="chip on" data-d="30">30 days</div>
-            <div class="chip" data-d="14">14 days</div>
-            <div class="chip on" data-d="7">7 days</div>
-            <div class="chip" data-d="3">3 days</div>
-            <div class="chip" data-d="1">1 day</div>
-          </div>
-        </div>
-        <div class="field" style="margin-bottom:22px;"><label>Internal Notes</label><input id="f-notes" placeholder="Seat count, account owner, renewal contact…"></div>
-        <div class="form-actions">
-          <button class="btn btn-primary" onclick="_addLicense()">Save Entry</button>
-          <button class="btn btn-ghost" onclick="_toggleForm()">Discard</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="toolbar">
-      <span class="toolbar-left">All Licenses</span>
-      <span style="font-size:12px;color:var(--faint)" id="row-count"></span>
-    </div>
-
-    <div class="table-wrap">
-      <div class="table-head">
-        <div>License</div><div>Category</div><div>Expires</div>
-        <div>Cost</div><div>Status</div><div style="text-align:right">Actions</div>
-      </div>
-      <div id="license-list"></div>
-    </div>
-
-    <div class="settings-panel">
-      <div class="settings-panel-header">Notification Settings</div>
-      <div class="settings-body">
-        <div class="settings-grid">
-          <div class="settings-block">
-            <div>
-              <h4>Recipient Email</h4>
-              <p>Reminders will be sent to this address via your default email client.</p>
-            </div>
-            <div class="field"><input type="email" id="s-email" placeholder="you@company.com" oninput="_saveSettings()"></div>
-          </div>
-          <div class="settings-block">
-            <div>
-              <h4>Default Reminder Schedule</h4>
-              <p>Applied to all licenses unless overridden per entry.</p>
-            </div>
-            <div class="chips" id="global-chips">
-              <div class="chip" data-d="90">90d</div>
-              <div class="chip on" data-d="60">60d</div>
-              <div class="chip on" data-d="30">30d</div>
-              <div class="chip" data-d="14">14d</div>
-              <div class="chip on" data-d="7">7d</div>
-              <div class="chip" data-d="3">3d</div>
-              <div class="chip" data-d="1">1d</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="action-row">
-        <button class="btn btn-primary" onclick="_sendAll()">Send Reminders</button>
-        <div class="divider"></div>
-        <button class="text-link" onclick="_exportData()">Export JSON</button>
-        <button class="text-link" onclick="document.getElementById('imp').click()">Import JSON</button>
-        <input type="file" id="imp" style="display:none" accept=".json" onchange="_importData(event)">
-        <span class="action-row-note">Opens your email client with all due licenses pre-filled</span>
+      <div class="vault-grid" id="vault-grid">
+        <!-- populated by JS -->
       </div>
     </div>
   </div>
-  <footer class="footer">
-    © 2026 Karam Al-Ramahi <span>·</span> re-newly
-  </footer>
 
+  <!-- VAULT SCREEN -->
+  <div id="vault-screen">
+    <div class="page">
+      <div class="page-header">
+        <div>
+          <h1 id="vault-title">Vault</h1>
+          <p class="page-subtitle" id="vault-subtitle"></p>
+        </div>
+        <button class="btn-add-license" id="add-license-btn" onclick="_toggleForm()">
+          <span class="btn-add-icon">
+            <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+          Add License
+        </button>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-indicator"></div><div class="kpi-label">Total</div><div class="kpi-value" id="k-total">0</div><div class="kpi-sub">licenses tracked</div></div>
+        <div class="kpi kpi-danger"><div class="kpi-indicator"></div><div class="kpi-label">Expired</div><div class="kpi-value" id="k-expired">0</div><div class="kpi-sub">action required</div></div>
+        <div class="kpi kpi-warn"><div class="kpi-indicator"></div><div class="kpi-label">Expiring Soon</div><div class="kpi-value" id="k-warn">0</div><div class="kpi-sub">within 30 days</div></div>
+        <div class="kpi kpi-ok"><div class="kpi-indicator"></div><div class="kpi-label">Active</div><div class="kpi-value" id="k-ok">0</div><div class="kpi-sub">in good standing</div></div>
+      </div>
+
+      <div class="form-panel" id="add-form">
+        <div class="form-panel-header">New License Entry</div>
+        <div class="form-body">
+          <div class="form-grid fg-3">
+            <div class="field"><label>License Name *</label><input id="f-name" placeholder="e.g. Adobe Creative Cloud"></div>
+            <div class="field"><label>Vendor</label><input id="f-vendor" placeholder="e.g. Adobe Inc."></div>
+            <div class="field"><label>Category</label><select id="f-cat"><option>Software</option><option>SaaS</option><option>Domain</option><option>SSL / Security</option><option>Hardware</option><option>Other</option></select></div>
+          </div>
+          <div class="form-grid fg-3">
+            <div class="field"><label>Expiration Date *</label><input type="date" id="f-expiry"></div>
+            <div class="field"><label>Annual Cost</label><input id="f-cost" placeholder="e.g. $299 / year"></div>
+            <div class="field"><label>Seats / Licenses</label><input type="number" id="f-seats" placeholder="e.g. 10" min="1"></div>
+          </div>
+          <div class="chips-group"><label>Reminder Intervals</label>
+            <div class="chips" id="form-chips">
+              <div class="chip" data-d="90">90 days</div><div class="chip on" data-d="60">60 days</div><div class="chip on" data-d="30">30 days</div>
+              <div class="chip" data-d="14">14 days</div><div class="chip on" data-d="7">7 days</div><div class="chip" data-d="3">3 days</div><div class="chip" data-d="1">1 day</div>
+            </div>
+          </div>
+          <div class="field" style="margin-bottom:22px"><label>Internal Notes</label><input id="f-notes" placeholder="Seat count, account owner, renewal contact…"></div>
+          <div class="form-actions">
+            <button class="btn btn-primary" onclick="_addLicense()">Save Entry</button>
+            <button class="btn btn-ghost" onclick="_toggleForm()">Discard</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <span class="toolbar-left">Licenses</span>
+        <div class="toolbar-right">
+          <div class="search-wrap">
+            <svg class="search-icon" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M10 10L13.5 13.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <input id="search-input" class="search-input" placeholder="Search by name, vendor, category…" oninput="_filterLicenses()">
+          </div>
+          <div class="filter-group">
+            <button class="filter-btn active" data-filter="all" onclick="_setFilter('all',this)">All</button>
+            <button class="filter-btn" data-filter="expired" onclick="_setFilter('expired',this)">Expired</button>
+            <button class="filter-btn" data-filter="expiring" onclick="_setFilter('expiring',this)">Expiring</button>
+            <button class="filter-btn" data-filter="active" onclick="_setFilter('active',this)">Active</button>
+          </div>
+          <span class="row-count-badge" id="row-count"></span>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-head">
+          <div>License</div><div>Category</div><div>Expires</div>
+          <div>Cost</div><div>Seats</div><div>Status</div><div style="text-align:right">Actions</div>
+        </div>
+        <div id="license-list"></div>
+      </div>
+
+      <!-- REMINDER SETTINGS -->
+      <div class="settings-panel" id="reminder-panel">
+        <div class="settings-panel-header">Reminder Settings</div>
+        <div class="settings-body">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:40px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:200px;">
+              <h4 style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Reminder Schedule</h4>
+              <p style="font-size:12px;color:var(--muted);font-weight:300;">Automatic emails sent at each selected interval before a license expires.</p>
+            </div>
+            <div style="flex:1;min-width:200px;">
+              <div class="reminder-dropdown-wrap" id="reminder-dropdown-wrap">
+                <button class="reminder-dropdown-trigger" id="reminder-dropdown-trigger" onclick="_toggleReminderDropdown()">
+                  <span id="reminder-trigger-text">Loading…</span>
+                  <svg style="width:14px;height:14px;transition:transform .2s;" id="reminder-chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="reminder-dropdown-menu" id="reminder-dropdown-menu">
+                  <div class="reminder-dropdown-label">Select reminder intervals</div>
+                  <div class="reminder-option" data-d="90"><span class="reminder-check" id="rc-90">✓</span> 90 days before</div>
+                  <div class="reminder-option" data-d="60"><span class="reminder-check active" id="rc-60">✓</span> 60 days before</div>
+                  <div class="reminder-option" data-d="30"><span class="reminder-check active" id="rc-30">✓</span> 30 days before</div>
+                  <div class="reminder-option" data-d="14"><span class="reminder-check" id="rc-14">✓</span> 14 days before</div>
+                  <div class="reminder-option" data-d="7"><span class="reminder-check active" id="rc-7">✓</span> 7 days before</div>
+                  <div class="reminder-option" data-d="3"><span class="reminder-check" id="rc-3">✓</span> 3 days before</div>
+                  <div class="reminder-option" data-d="1"><span class="reminder-check" id="rc-1">✓</span> 1 day before</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VAULT MEMBERS (only for owner) -->
+      <div class="settings-panel" id="vault-members-panel">
+        <div class="settings-panel-header">
+          <span>Vault Members</span>
+          <button class="btn-invite" onclick="_openInviteModal()">
+            <svg viewBox="0 0 16 16" fill="none" width="13" height="13"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Invite Member
+          </button>
+        </div>
+        <div class="settings-body">
+          <p style="font-size:12px;color:var(--muted);font-weight:300;margin-bottom:16px;">Invite teammates to view or manage this vault. They'll receive an email invitation.</p>
+          <div id="members-list"><div class="members-empty">No members yet. Invite someone to share this vault.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">© 2026 Karam Al-Ramahi <span>·</span> re-newly</footer>
+</div>
+
+<!-- CREATE VAULT MODAL -->
+<div class="overlay" id="create-vault-modal">
+  <div class="modal">
+    <div class="modal-header"><h3>Create New Vault</h3></div>
+    <div class="modal-body">
+      <div class="field" style="margin-bottom:16px">
+        <label>Vault Name *</label>
+        <input id="cv-name" placeholder="e.g. Work Licenses, Client A, Personal">
+      </div>
+      <div class="field" style="margin-bottom:4px">
+        <label>Description</label>
+        <input id="cv-desc" placeholder="Optional — what this vault is for">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="_confirmCreateVault()">Create Vault</button>
+      <button class="btn btn-ghost" onclick="_closeCreateVaultModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- INVITE MODAL -->
+<div class="overlay" id="invite-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Invite Member</h3>
+      <p style="font-size:13px;color:var(--muted);font-weight:300;margin-top:6px">They'll receive an email invitation to this vault.</p>
+    </div>
+    <div class="modal-body">
+      <div class="field" style="margin-bottom:14px"><label>Email Address *</label><input type="email" id="inv-email" placeholder="colleague@company.com"></div>
+      <div class="field" style="margin-bottom:4px"><label>Access Level</label>
+        <div class="role-selector">
+          <div class="role-option active" id="role-viewer" onclick="_selectRole('viewer')">
+            <div class="role-icon">👁</div>
+            <div><div style="font-weight:600;font-size:13px">View Only</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Can see all licenses, cannot edit</div></div>
+            <span class="role-check active" id="role-check-viewer">✓</span>
+          </div>
+          <div class="role-option" id="role-editor" onclick="_selectRole('editor')">
+            <div class="role-icon">✎</div>
+            <div><div style="font-weight:600;font-size:13px">Full Access</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Can add, edit, and delete licenses</div></div>
+            <span class="role-check" id="role-check-editor">✓</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="_sendInvite()">Send Invitation</button>
+      <button class="btn btn-ghost" onclick="_closeInviteModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="overlay" id="edit-modal">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header"><h3>Edit License</h3></div>
+    <div class="modal-body">
+      <div class="form-grid fg-2" style="margin-bottom:14px">
+        <div class="field"><label>License Name *</label><input id="e-name" placeholder="e.g. Adobe Creative Cloud"></div>
+        <div class="field"><label>Vendor</label><input id="e-vendor" placeholder="e.g. Adobe Inc."></div>
+      </div>
+      <div class="form-grid fg-3" style="margin-bottom:14px">
+        <div class="field"><label>Expiration Date *</label><input type="date" id="e-expiry"></div>
+        <div class="field"><label>Annual Cost</label><input id="e-cost" placeholder="e.g. $299 / year"></div>
+        <div class="field"><label>Seats</label><input type="number" id="e-seats" placeholder="e.g. 10" min="1"></div>
+      </div>
+      <div class="form-grid" style="margin-bottom:14px">
+        <div class="field"><label>Category</label><select id="e-cat"><option>Software</option><option>SaaS</option><option>Domain</option><option>SSL / Security</option><option>Hardware</option><option>Other</option></select></div>
+      </div>
+      <div class="field" style="margin-bottom:4px"><label>Internal Notes</label><input id="e-notes" placeholder="Seat count, account owner…"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="_confirmEdit()">Save Changes</button>
+      <button class="btn btn-ghost" onclick="_closeEditModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- RENEW MODAL -->
+<div class="overlay" id="renew-modal">
+  <div class="modal">
+    <div class="modal-header"><h3>Renew License</h3><p style="font-size:13px;color:var(--muted);font-weight:300;margin-top:6px" id="renew-modal-name"></p></div>
+    <div class="modal-body">
+      <div class="form-grid fg-2" style="margin-bottom:14px">
+        <div class="field"><label>New Expiry Date *</label><input type="date" id="r-expiry"></div>
+        <div class="field"><label>Updated Cost</label><input id="r-cost" placeholder="e.g. $299 / year"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" id="renew-confirm-btn" onclick="_confirmRenew()"><span class="renew-btn-text">✓ Confirm Renewal</span></button>
+      <button class="btn btn-ghost" onclick="_closeRenewModal()">Cancel</button>
+    </div>
+  </div>
 </div>
 
 <!-- DELETE MODAL -->
 <div class="overlay" id="del-modal">
   <div class="modal">
     <div class="modal-header"><h3>Remove License?</h3></div>
-    <div class="modal-body">This entry will be permanently deleted. This action cannot be undone.</div>
+    <div class="modal-body"><p style="font-size:13px;color:var(--muted)">This entry will be permanently deleted from this vault. This cannot be undone.</p></div>
     <div class="modal-footer">
       <button class="btn btn-danger" onclick="_confirmDelete()">Remove Entry</button>
       <button class="btn btn-ghost" onclick="_closeModal()">Cancel</button>
@@ -606,310 +594,641 @@
   </div>
 </div>
 
+<!-- DELETE VAULT MODAL -->
+<div class="overlay" id="del-vault-modal">
+  <div class="modal">
+    <div class="modal-header"><h3>Delete Vault?</h3></div>
+    <div class="modal-body"><p style="font-size:13px;color:var(--muted)">This will permanently delete the vault and all its licenses. This cannot be undone.</p></div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" onclick="_confirmDeleteVault()">Delete Vault</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('del-vault-modal').classList.remove('open')">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, doc, getDocs, setDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, doc, getDocs, setDoc, deleteDoc, getDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBxSpcb3DMtv7UWStqrxA9xULASE7eE_kI",
-    authDomain: "renewly-af1de.firebaseapp.com",
-    projectId: "renewly-af1de",
-    storageBucket: "renewly-af1de.firebasestorage.app",
-    messagingSenderId: "730729566841",
-    appId: "1:730729566841:web:7d45d0a548e4800b14faa8",
-    measurementId: "G-0TCBK03B6T"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyBxSpcb3DMtv7UWStqrxA9xULASE7eE_kI",
+  authDomain: "renewly-af1de.firebaseapp.com",
+  projectId: "renewly-af1de",
+  storageBucket: "renewly-af1de.firebasestorage.app",
+  messagingSenderId: "730729566841",
+  appId: "1:730729566841:web:7d45d0a548e4800b14faa8"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const db  = getFirestore(app);
-  const auth = getAuth(app);
-  const googleProvider = new GoogleAuthProvider();
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
 
-  let licenses = [];
-  let settings = {email:'', intervals:[60,30,7]};
-  let delTarget = null;
-  let currentUser = null;
+// ── State ─────────────────────────────────────────────────────────────────
+let currentUser  = null;
+let myVaults     = [];   // [{id, name, desc, ownerId, role:'owner'}]
+let sharedVaults = [];   // [{id, name, ownerId, ownerName, ownerEmail, role:'viewer'|'editor'}]
+let currentVault = null; // the active vault object
+let licenses     = [];
+let settings     = { email:'', intervals:[60,30,7] };
+let members      = [];
+let delTarget    = null;
+let editTarget   = null;
+let renewTarget  = null;
+let selectedRole = 'viewer';
+let activeFilter = 'all';
+let searchQuery  = '';
+let delVaultTarget = null;
 
-  // ── helpers ──────────────────────────────────────────────
-  function uid()     { return Date.now().toString(36)+Math.random().toString(36).slice(2); }
-  function diff(exp) { const n=new Date(); n.setHours(0,0,0,0); return Math.round((new Date(exp+'T00:00:00')-n)/86400000); }
-  function esc(s)    { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
-  function userCol(path) { return `users/${currentUser.uid}/${path}`; }
+// ── Helpers ───────────────────────────────────────────────────────────────
+function uid()     { return Date.now().toString(36)+Math.random().toString(36).slice(2); }
+function diff(exp) { const n=new Date(); n.setHours(0,0,0,0); return Math.round((new Date(exp+'T00:00:00')-n)/86400000); }
+function esc(s)    { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
+function vaultCol(path) { return `vaults/${currentVault.id}/${path}`; }
 
-  // ── auth ui ──────────────────────────────────────────────
-  window.switchTab = (tab) => {
-    document.getElementById('tab-login').classList.toggle('active', tab==='login');
-    document.getElementById('tab-signup').classList.toggle('active', tab==='signup');
-    document.getElementById('auth-submit-btn').textContent = tab==='login' ? 'Sign In' : 'Create Account';
-    document.getElementById('auth-error').classList.remove('show');
-  };
+// ── Auth UI ───────────────────────────────────────────────────────────────
+window.switchTab = (tab) => {
+  document.getElementById('tab-login').classList.toggle('active', tab==='login');
+  document.getElementById('tab-signup').classList.toggle('active', tab==='signup');
+  document.getElementById('auth-submit-btn').textContent = tab==='login' ? 'Sign In' : 'Create Account';
+  document.getElementById('auth-error').classList.remove('show');
+};
 
-  function showAuthError(msg) {
-    const el = document.getElementById('auth-error');
-    el.textContent = msg;
-    el.classList.add('show');
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg; el.classList.add('show');
+}
+
+window.submitAuth = async () => {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const isLogin = document.getElementById('tab-login').classList.contains('active');
+  if (!email||!password) { showAuthError('Please enter your email and password.'); return; }
+  try {
+    if (isLogin) { await signInWithEmailAndPassword(auth,email,password); }
+    else { await createUserWithEmailAndPassword(auth,email,password); }
+  } catch(e) {
+    const msgs = {'auth/invalid-email':'Invalid email address.','auth/user-not-found':'No account found.','auth/wrong-password':'Incorrect password.','auth/email-already-in-use':'Account already exists — sign in instead.','auth/weak-password':'Password must be at least 6 characters.','auth/invalid-credential':'Invalid email or password.'};
+    showAuthError(msgs[e.code]||e.message);
   }
+};
 
-  window.submitAuth = async () => {
-    const email    = document.getElementById('auth-email').value.trim();
-    const password = document.getElementById('auth-password').value;
-    const isLogin  = document.getElementById('tab-login').classList.contains('active');
-    if (!email || !password) { showAuthError('Please enter your email and password.'); return; }
+window.signInWithGoogle = async () => {
+  try { await signInWithPopup(auth, googleProvider); }
+  catch(e) { showAuthError('Google sign-in failed. Please try again.'); }
+};
+
+window._signOut = () => signOut(auth);
+
+function hideLoader() {
+  const loader = document.getElementById('loading-screen');
+  loader.classList.add('fade-out');
+  setTimeout(() => loader.style.display='none', 300);
+}
+
+// ── Auth State ────────────────────────────────────────────────────────────
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUser = user;
+    document.getElementById('auth-screen').classList.add('hidden');
+    document.getElementById('app-screen').classList.remove('hidden');
+    hideLoader();
+    document.getElementById('nav-user').textContent = user.displayName || user.email;
+    const d = new Date();
+    document.getElementById('nav-date').textContent = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    document.querySelectorAll('#form-chips .chip').forEach(c => { c.onclick = () => c.classList.toggle('on'); });
+
+    // Ensure user doc exists
     try {
-      if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
-      } else {
-        await createUserWithEmailAndPassword(auth, email, password);
+      const userDocRef = doc(db, 'users', user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+      if (!userDocSnap.exists()) {
+        await setDoc(userDocRef, { email: user.email, displayName: user.displayName||'', createdAt: new Date().toISOString() });
       }
-    } catch(e) {
-      const msgs = {
-        'auth/invalid-email': 'Invalid email address.',
-        'auth/user-not-found': 'No account found with this email.',
-        'auth/wrong-password': 'Incorrect password.',
-        'auth/email-already-in-use': 'An account with this email already exists.',
-        'auth/weak-password': 'Password should be at least 6 characters.',
-        'auth/invalid-credential': 'Invalid email or password.',
-      };
-      showAuthError(msgs[e.code] || e.message);
-    }
-  };
+    } catch(e) {}
 
-  window.signInWithGoogle = async () => {
+    await loadDashboard();
+  } else {
+    currentUser = null;
+    document.getElementById('auth-screen').classList.remove('hidden');
+    document.getElementById('app-screen').classList.add('hidden');
+    hideLoader();
+  }
+});
+
+// ── Dashboard ─────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  myVaults = []; sharedVaults = [];
+
+  // Load vaults I own
+  const ownerSnap = await getDocs(collection(db, `users/${currentUser.uid}/vaults`));
+  const vaultRefs = ownerSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+  for (const ref of vaultRefs) {
     try {
-      await signInWithPopup(auth, googleProvider);
-    } catch(e) {
-      showAuthError('Google sign-in failed. Please try again.');
-    }
-  };
-
-  window._signOut = () => signOut(auth);
-
-  // ── auth state ────────────────────────────────────────────
-  function hideLoader() {
-    const loader = document.getElementById('loading-screen');
-    loader.classList.add('fade-out');
-    setTimeout(() => loader.style.display = 'none', 300);
+      const vDoc = await getDoc(doc(db, `vaults/${ref.id}`));
+      if (vDoc.exists()) {
+        const licSnap = await getDocs(collection(db, `vaults/${ref.id}/licenses`));
+        const lics = licSnap.docs.map(d => ({ id:d.id, ...d.data() })).filter(l=>l.name);
+        myVaults.push({ ...vDoc.data(), id: ref.id, role:'owner', licenses: lics });
+      }
+    } catch(e) {}
   }
 
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      currentUser = user;
-      document.getElementById('auth-screen').classList.add('hidden');
-      document.getElementById('app-screen').classList.remove('hidden');
-      hideLoader();
-      document.getElementById('nav-user').textContent = user.displayName || user.email;
-      const d = new Date();
-      document.getElementById('nav-date').textContent = d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-      document.querySelectorAll('#global-chips .chip').forEach(c => {
-        c.onclick = () => { c.classList.toggle('on'); window._saveGlobalIntervals(); };
-      });
-      document.querySelectorAll('#form-chips .chip').forEach(c => { c.onclick = () => c.classList.toggle('on'); });
-
-      // Ensure user document exists so the reminder Worker can find this user
+  // Check shared vaults (vaults where I'm a member)
+  try {
+    const allUsersSnap = await getDocs(collection(db, 'users'));
+    for (const userDoc of allUsersSnap.docs) {
+      const ownerId = userDoc.id;
+      if (ownerId === currentUser.uid) continue;
       try {
-        const userDocRef = doc(db, 'users', user.uid);
-        const userDocSnap = await getDoc(userDocRef);
-        if (!userDocSnap.exists()) {
-          await setDoc(userDocRef, {
-            email: user.email,
-            displayName: user.displayName || '',
-            createdAt: new Date().toISOString()
-          });
+        const memberDoc = await getDoc(doc(db, `vaults`)); // we'll use the members subcollection on the vault
+        // Check all this owner's vaults
+        const ownerVaultsSnap = await getDocs(collection(db, `users/${ownerId}/vaults`));
+        for (const ovRef of ownerVaultsSnap.docs) {
+          try {
+            const memDoc = await getDoc(doc(db, `vaults/${ovRef.id}/members/${currentUser.uid}`));
+            if (!memDoc.exists() || memDoc.data().status !== 'active') continue;
+            const vDoc = await getDoc(doc(db, `vaults/${ovRef.id}`));
+            if (!vDoc.exists()) continue;
+            const licSnap = await getDocs(collection(db, `vaults/${ovRef.id}/licenses`));
+            const lics = licSnap.docs.map(d => ({id:d.id,...d.data()})).filter(l=>l.name);
+            const ownerData = userDoc.data();
+            sharedVaults.push({
+              ...vDoc.data(), id: ovRef.id,
+              ownerId, ownerName: ownerData.displayName||ownerData.email,
+              ownerEmail: ownerData.email,
+              role: memDoc.data().role,
+              licenses: lics
+            });
+          } catch(e) {}
         }
-      } catch(e) { console.warn('Could not create user doc:', e); }
-
-      await loadData();
-    } else {
-      currentUser = null;
-      document.getElementById('auth-screen').classList.remove('hidden');
-      document.getElementById('app-screen').classList.add('hidden');
-      hideLoader();
+      } catch(e) {}
     }
+  } catch(e) {}
+
+  renderDashboard();
+}
+
+function renderDashboard() {
+  showScreen('dashboard');
+  document.getElementById('nav-crumb').style.display = 'none';
+  const grid = document.getElementById('vault-grid');
+  const allVaults = [...myVaults, ...sharedVaults];
+
+  let html = '';
+
+  // My vaults
+  myVaults.forEach(v => {
+    const expired = v.licenses.filter(l => diff(l.expiry) < 0).length;
+    const expiring = v.licenses.filter(l => { const d=diff(l.expiry); return d>=0&&d<=30; }).length;
+    html += `<div class="vault-card" onclick="openVault('${v.id}','owner')">
+      <span class="vault-role-badge badge-owner">Owner</span>
+      <div class="vault-card-icon">🗄️</div>
+      <div class="vault-card-name">${esc(v.name)}</div>
+      <div class="vault-card-meta">${esc(v.desc||'Personal vault')}</div>
+      <div class="vault-card-stats">
+        <div class="vault-stat"><strong>${v.licenses.length}</strong>licenses</div>
+        ${expired ? `<div class="vault-stat stat-danger"><strong>${expired}</strong>expired</div>` : ''}
+        ${expiring ? `<div class="vault-stat stat-warn"><strong>${expiring}</strong>expiring</div>` : ''}
+      </div>
+    </div>`;
   });
 
-  // ── data ──────────────────────────────────────────────────
-  async function loadData() {
-    toast('Loading…');
-    const snap = await getDocs(collection(db, userCol('licenses')));
-    licenses = snap.docs
-      .map(d => { const data = d.data(); data.id = d.id; return data; })
-      .filter(l => l.name);
+  // Shared vaults
+  sharedVaults.forEach(v => {
+    const expired = v.licenses.filter(l => diff(l.expiry) < 0).length;
+    const expiring = v.licenses.filter(l => { const d=diff(l.expiry); return d>=0&&d<=30; }).length;
+    const badgeClass = v.role === 'editor' ? 'badge-editor' : 'badge-viewer';
+    const badgeLabel = v.role === 'editor' ? 'Editor' : 'Viewer';
+    html += `<div class="vault-card shared-card" onclick="openVault('${v.id}','${v.role}')">
+      <span class="vault-role-badge ${badgeClass}">${badgeLabel}</span>
+      <div class="vault-card-icon">🔐</div>
+      <div class="vault-card-name">${esc(v.name)}</div>
+      <div class="vault-card-meta">Shared by ${esc(v.ownerName)}</div>
+      <div class="vault-card-stats">
+        <div class="vault-stat"><strong>${v.licenses.length}</strong>licenses</div>
+        ${expired ? `<div class="vault-stat stat-danger"><strong>${expired}</strong>expired</div>` : ''}
+        ${expiring ? `<div class="vault-stat stat-warn"><strong>${expiring}</strong>expiring</div>` : ''}
+      </div>
+    </div>`;
+  });
 
-    const sSnap = await getDoc(doc(db, userCol('settings/global')));
+  // New vault card
+  html += `<div class="vault-card new-card" onclick="_openCreateVaultModal()">
+    <div class="new-card-plus">+</div>
+    <div class="new-card-label">Create New Vault</div>
+  </div>`;
+
+  grid.innerHTML = html;
+}
+
+// ── Open Vault ────────────────────────────────────────────────────────────
+window.openVault = async (vaultId, role) => {
+  const vault = [...myVaults, ...sharedVaults].find(v => v.id === vaultId);
+  if (!vault) return;
+  currentVault = vault;
+  licenses = [...vault.licenses];
+  activeFilter = 'all'; searchQuery = '';
+
+  showScreen('vault');
+  document.getElementById('nav-crumb').style.display = 'flex';
+  document.getElementById('nav-vault-name').textContent = vault.name;
+
+  // Vault title
+  document.getElementById('vault-title').innerHTML = esc(vault.name).replace(/(\S+)\s+(.+)/, '$1 <span>$2</span>') || `<span>${esc(vault.name)}</span>`;
+  document.getElementById('vault-subtitle').textContent = role === 'owner'
+    ? (vault.desc || 'Your personal vault')
+    : `Shared by ${vault.ownerName} · ${role === 'editor' ? 'Full Access' : 'View Only'}`;
+
+  // Show/hide add button
+  const canEdit = role === 'owner' || role === 'editor';
+  document.getElementById('add-license-btn').style.display = canEdit ? 'flex' : 'none';
+  document.getElementById('add-form').classList.remove('open');
+
+  // Show/hide members panel (owner only)
+  document.getElementById('vault-members-panel').style.display = role === 'owner' ? 'block' : 'none';
+  document.getElementById('reminder-panel').style.display = 'block';
+
+  // Load settings for this vault
+  settings = { email:'', intervals:[60,30,7] };
+  try {
+    const sSnap = await getDoc(doc(db, `vaults/${vaultId}/settings/global`));
     if (sSnap.exists()) {
       settings = sSnap.data();
-      document.getElementById('s-email').value = settings.email || '';
-      document.querySelectorAll('#global-chips .chip').forEach(c => {
-        c.classList.toggle('on', (settings.intervals||[]).includes(+c.dataset.d));
+      const intervals = settings.intervals || [60,30,7];
+      [90,60,30,14,7,3,1].forEach(d => {
+        const check = document.getElementById('rc-'+d);
+        if (check) check.classList.toggle('active', intervals.includes(d));
       });
     }
-    render();
-  }
+  } catch(e) {}
+  _updateReminderTriggerText();
+  _initReminderDropdown();
 
-  async function saveLicense(lic) {
-    await setDoc(doc(db, userCol(`licenses/${lic.id}`)), lic);
-  }
+  // Load members if owner
+  if (role === 'owner') await loadMembers();
 
-  async function saveSettings() {
-    settings.email = document.getElementById('s-email').value;
-    await setDoc(doc(db, userCol('settings/global')), settings);
-  }
+  // Render
+  document.getElementById('search-input').value = '';
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter==='all'));
+  render();
+};
 
-  async function saveGlobalIntervals() {
-    settings.intervals = [...document.querySelectorAll('#global-chips .chip.on')].map(c=>+c.dataset.d);
-    await setDoc(doc(db, userCol('settings/global')), settings);
-  }
+window.goToDashboard = async () => {
+  currentVault = null; licenses = [];
+  await loadDashboard();
+};
 
-  // ── render ────────────────────────────────────────────────
-  function statusOf(days) {
-    if (days < 0)   return {row:'row-expired',  tag:'tag-expired',  label:'Expired',  dc:'c-danger', dtext:`${Math.abs(days)}d overdue`};
-    if (days <= 7)  return {row:'row-critical', tag:'tag-critical', label:'Critical', dc:'c-danger', dtext:`${days}d left`};
-    if (days <= 30) return {row:'row-warning',  tag:'tag-warning',  label:'Expiring', dc:'c-warn',   dtext:`${days}d left`};
-    return              {row:'',             tag:'tag-ok',       label:'Active',   dc:'c-ok',     dtext:`${days}d left`};
-  }
+function showScreen(name) {
+  document.getElementById('dashboard-screen').classList.toggle('show', name==='dashboard');
+  document.getElementById('vault-screen').classList.toggle('show', name==='vault');
+}
 
-  function render() {
-    const sorted = [...licenses].sort((a,b)=>diff(a.expiry)-diff(b.expiry));
-    const list   = document.getElementById('license-list');
-    if (!sorted.length) {
-      list.innerHTML = `<div class="table-empty"><div style="font-size:28px;opacity:.2;margin-bottom:8px">📋</div><p>No licenses tracked. Add your first entry above.</p></div>`;
-    } else {
-      list.innerHTML = sorted.map((lic,i) => {
-        const days=diff(lic.expiry), s=statusOf(days);
-        return `
-          <div class="table-row ${s.row}" style="animation-delay:${i*35}ms">
-            <div>
-              <div class="row-name">${esc(lic.name)}</div>
-              <div class="row-vendor">${esc(lic.vendor||'—')}${lic.notes?` · <span style="color:var(--faint)">${esc(lic.notes)}</span>`:''}</div>
-            </div>
-            <div class="row-cell">${esc(lic.category)}</div>
-            <div class="row-cell">${lic.expiry}</div>
-            <div class="row-cost">${esc(lic.cost||'—')}</div>
-            <div>
-              <span class="status-tag ${s.tag}"><span class="tag-dot"></span>${s.label}</span>
-              <div class="days-count ${s.dc}">${s.dtext}</div>
-            </div>
-            <div class="row-actions">
-              <button class="btn-icon" title="Send reminder" onclick="window._emailOne('${lic.id}')">✉</button>
-              <button class="btn-icon" title="Delete" onclick="window._promptDelete('${lic.id}')">✕</button>
-            </div>
-          </div>`;
-      }).join('');
-    }
-    document.getElementById('row-count').textContent = licenses.length ? `${licenses.length} entr${licenses.length===1?'y':'ies'}` : '';
-    document.getElementById('k-total').textContent   = licenses.length;
-    document.getElementById('k-expired').textContent = licenses.filter(l=>diff(l.expiry)<0).length;
-    document.getElementById('k-warn').textContent    = licenses.filter(l=>{const d=diff(l.expiry);return d>=0&&d<=30;}).length;
-    document.getElementById('k-ok').textContent      = licenses.filter(l=>diff(l.expiry)>30).length;
-  }
+// ── Create Vault ──────────────────────────────────────────────────────────
+window._openCreateVaultModal = () => {
+  document.getElementById('cv-name').value = '';
+  document.getElementById('cv-desc').value = '';
+  document.getElementById('create-vault-modal').classList.add('open');
+};
+window._closeCreateVaultModal = () => document.getElementById('create-vault-modal').classList.remove('open');
 
-  // ── global actions ────────────────────────────────────────
-  window._toggleForm = () => document.getElementById('add-form').classList.toggle('open');
-
-  window._addLicense = async () => {
-    const name=document.getElementById('f-name').value.trim();
-    const expiry=document.getElementById('f-expiry').value;
-    if (!name||!expiry) { toast('License name and expiry date are required.'); return; }
-    const lic = {
-      id:uid(), name,
-      vendor:   document.getElementById('f-vendor').value.trim(),
-      category: document.getElementById('f-cat').value,
-      expiry,
-      cost:     document.getElementById('f-cost').value.trim(),
-      notes:    document.getElementById('f-notes').value.trim(),
-      reminders:[...document.querySelectorAll('#form-chips .chip.on')].map(c=>+c.dataset.d)
-    };
-    toast('Saving…');
-    await saveLicense(lic);
-    licenses.push(lic);
-    render();
-    ['f-name','f-vendor','f-expiry','f-cost','f-notes'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('add-form').classList.remove('open');
-    toast('License entry saved.');
+window._confirmCreateVault = async () => {
+  const name = document.getElementById('cv-name').value.trim();
+  if (!name) { toast('Please enter a vault name.'); return; }
+  const vaultId = uid();
+  const vaultData = {
+    id: vaultId, name,
+    desc: document.getElementById('cv-desc').value.trim(),
+    ownerId: currentUser.uid,
+    createdAt: new Date().toISOString()
   };
+  toast('Creating vault…');
+  await setDoc(doc(db, `vaults/${vaultId}`), vaultData);
+  await setDoc(doc(db, `users/${currentUser.uid}/vaults/${vaultId}`), { name, createdAt: vaultData.createdAt });
+  const newVault = { ...vaultData, role:'owner', licenses:[] };
+  myVaults.push(newVault);
+  window._closeCreateVaultModal();
+  toast('Vault created!');
+  // Open it immediately
+  openVault(vaultId, 'owner');
+};
 
-  window._promptDelete = (id) => { delTarget=id; document.getElementById('del-modal').classList.add('open'); };
-  window._closeModal   = ()   => { document.getElementById('del-modal').classList.remove('open'); delTarget=null; };
+// ── Delete Vault ──────────────────────────────────────────────────────────
+window._promptDeleteVault = (vaultId) => {
+  delVaultTarget = vaultId;
+  document.getElementById('del-vault-modal').classList.add('open');
+};
+window._confirmDeleteVault = async () => {
+  if (!delVaultTarget) return;
+  toast('Deleting vault…');
+  try {
+    // Delete all licenses in vault
+    const licSnap = await getDocs(collection(db, `vaults/${delVaultTarget}/licenses`));
+    const batch = writeBatch(db);
+    licSnap.docs.forEach(d => batch.delete(d.ref));
+    batch.delete(doc(db, `vaults/${delVaultTarget}`));
+    batch.delete(doc(db, `users/${currentUser.uid}/vaults/${delVaultTarget}`));
+    await batch.commit();
+    myVaults = myVaults.filter(v => v.id !== delVaultTarget);
+    document.getElementById('del-vault-modal').classList.remove('open');
+    delVaultTarget = null;
+    toast('Vault deleted.');
+    goToDashboard();
+  } catch(e) { toast('Error: '+e.message); }
+};
 
-  window._confirmDelete = async () => {
-    try {
-      toast('Deleting…');
-      await deleteDoc(doc(db, userCol(`licenses/${delTarget}`)));
-      licenses = licenses.filter(l=>l.id!==delTarget);
-      render(); window._closeModal(); toast('Entry removed.');
-    } catch(e) {
-      toast('Error: ' + e.message);
-    }
-  };
+// ── Licenses ──────────────────────────────────────────────────────────────
+async function saveLicense(lic) {
+  await setDoc(doc(db, `vaults/${currentVault.id}/licenses/${lic.id}`), lic);
+  // Also update cached licenses in vault
+  const vi = [...myVaults,...sharedVaults].findIndex(v=>v.id===currentVault.id);
+}
 
-  window._saveSettings = saveSettings;
-  window._saveGlobalIntervals = saveGlobalIntervals;
+function statusOf(days) {
+  if (days < 0)   return {row:'row-expired',  tag:'tag-expired',  label:'Expired',  dc:'c-danger', dtext:`${Math.abs(days)}d overdue`};
+  if (days <= 7)  return {row:'row-critical', tag:'tag-critical', label:'Critical', dc:'c-danger', dtext:`${days}d left`};
+  if (days <= 30) return {row:'row-warning',  tag:'tag-warning',  label:'Expiring', dc:'c-warn',   dtext:`${days}d left`};
+  return              {row:'',             tag:'tag-ok',       label:'Active',   dc:'c-ok',     dtext:`${days}d left`};
+}
 
-  function dueLicenses() {
-    return licenses.map(l=>({l,days:diff(l.expiry)}))
-      .filter(({l,days})=>days<0||(l.reminders||settings.intervals).some(r=>days<=r))
-      .sort((a,b)=>a.days-b.days);
+function getFiltered() {
+  return [...licenses]
+    .filter(l => {
+      const q = searchQuery.toLowerCase();
+      if (q && !l.name.toLowerCase().includes(q) && !(l.vendor||'').toLowerCase().includes(q) && !(l.category||'').toLowerCase().includes(q)) return false;
+      if (activeFilter==='expired')  return diff(l.expiry)<0;
+      if (activeFilter==='expiring') return diff(l.expiry)>=0&&diff(l.expiry)<=30;
+      if (activeFilter==='active')   return diff(l.expiry)>30;
+      return true;
+    })
+    .sort((a,b)=>diff(a.expiry)-diff(b.expiry));
+}
+
+window._filterLicenses = () => { searchQuery = document.getElementById('search-input').value; render(); };
+window._setFilter = (f, el) => {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b===el));
+  render();
+};
+
+const canEditVault = () => currentVault && (currentVault.role === 'owner' || currentVault.role === 'editor');
+
+function render() {
+  const sorted = getFiltered();
+  const list = document.getElementById('license-list');
+  const canEdit = canEditVault();
+  if (!sorted.length) {
+    const msg = searchQuery||activeFilter!=='all' ? 'No licenses match your search or filter.' : 'No licenses in this vault yet.';
+    list.innerHTML = `<div class="table-empty"><div style="font-size:28px;opacity:.2;margin-bottom:8px">📋</div><p>${msg}</p></div>`;
+  } else {
+    list.innerHTML = sorted.map((lic,i) => {
+      const days=diff(lic.expiry), s=statusOf(days);
+      const seats = lic.seats ? `<span style="font-weight:500">${esc(String(lic.seats))}</span>` : '—';
+      return `<div class="table-row ${s.row}" style="animation-delay:${i*35}ms">
+        <div><div class="row-name">${esc(lic.name)}</div><div class="row-vendor">${esc(lic.vendor||'—')}${lic.notes?` · <span style="color:var(--faint)">${esc(lic.notes)}</span>`:''}</div></div>
+        <div class="row-cell">${esc(lic.category||'—')}</div>
+        <div class="row-cell">${lic.expiry}</div>
+        <div class="row-cost">${esc(lic.cost||'—')}</div>
+        <div class="row-cell">${seats}</div>
+        <div><span class="status-tag ${s.tag}"><span class="tag-dot"></span>${s.label}</span><div class="days-count ${s.dc}">${s.dtext}</div></div>
+        <div class="row-actions">
+          ${canEdit ? `<button class="btn-renew" onclick="window._promptRenew('${lic.id}')">↻ Renew</button>` : ''}
+          ${canEdit ? `<button class="btn-icon" title="Edit" onclick="window._promptEdit('${lic.id}')">✎</button>` : ''}
+          ${canEdit ? `<button class="btn-icon" title="Delete" onclick="window._promptDelete('${lic.id}')">✕</button>` : '<span style="font-size:11px;color:var(--faint)">View only</span>'}
+        </div>
+      </div>`;
+    }).join('');
   }
+  const total = licenses.length;
+  document.getElementById('row-count').textContent = sorted.length!==total ? `${sorted.length} of ${total}` : total ? `${total} entr${total===1?'y':'ies'}` : '';
+  document.getElementById('k-total').textContent   = total;
+  document.getElementById('k-expired').textContent = licenses.filter(l=>diff(l.expiry)<0).length;
+  document.getElementById('k-warn').textContent    = licenses.filter(l=>{const d=diff(l.expiry);return d>=0&&d<=30;}).length;
+  document.getElementById('k-ok').textContent      = licenses.filter(l=>diff(l.expiry)>30).length;
+}
 
-  function buildBody(items) {
-    let b=`LICENSE RENEWAL REMINDERS\n${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}\n${'─'.repeat(40)}\n\n`;
-    items.forEach(({l,days})=>{
-      b+=`${l.name.toUpperCase()}${l.vendor?' — '+l.vendor:''}\n`;
-      b+=days<0?`  EXPIRED — ${Math.abs(days)} day(s) ago\n`:`  Expires in ${days} day(s) (${l.expiry})\n`;
-      if(l.cost)  b+=`  Cost: ${l.cost}\n`;
-      if(l.notes) b+=`  Notes: ${l.notes}\n`;
-      b+='\n';
-    });
-    b+='─'.repeat(40)+'\nGenerated by re-newly';
-    return b;
-  }
+// ── CRUD ──────────────────────────────────────────────────────────────────
+window._toggleForm = () => { if(canEditVault()) document.getElementById('add-form').classList.toggle('open'); };
 
-  window._sendAll = () => {
-    const email=settings.email;
-    if (!email) { toast('Please enter your email in Notification Settings.'); return; }
-    const due=dueLicenses();
-    if (!due.length) { toast('No reminders are due at this time.'); return; }
-    window.open(`mailto:${email}?subject=${encodeURIComponent('License Reminders — '+due.length+' require attention')}&body=${encodeURIComponent(buildBody(due))}`);
+window._addLicense = async () => {
+  const name=document.getElementById('f-name').value.trim(), expiry=document.getElementById('f-expiry').value;
+  if (!name||!expiry) { toast('License name and expiry date are required.'); return; }
+  const seatsVal=document.getElementById('f-seats').value.trim();
+  const lic = {
+    id:uid(), name,
+    vendor:   document.getElementById('f-vendor').value.trim(),
+    category: document.getElementById('f-cat').value,
+    expiry, cost: document.getElementById('f-cost').value.trim(),
+    seats:    seatsVal ? parseInt(seatsVal) : null,
+    notes:    document.getElementById('f-notes').value.trim(),
+    reminders:[...document.querySelectorAll('#form-chips .chip.on')].map(c=>+c.dataset.d)
   };
+  toast('Saving…'); await saveLicense(lic);
+  licenses.push(lic); render();
+  ['f-name','f-vendor','f-expiry','f-cost','f-notes','f-seats'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('add-form').classList.remove('open');
+  toast('License saved.');
+};
 
-  window._emailOne = (id) => {
-    const lic=licenses.find(l=>l.id===id); if(!lic) return;
-    if (!settings.email) { toast('Please enter your email in Notification Settings.'); return; }
-    const days=diff(lic.expiry);
-    window.open(`mailto:${settings.email}?subject=${encodeURIComponent('License Reminder: '+lic.name)}&body=${encodeURIComponent(buildBody([{l:lic,days}]))}`);
-  };
+window._promptDelete = (id) => { delTarget=id; document.getElementById('del-modal').classList.add('open'); };
+window._closeModal   = ()   => { document.getElementById('del-modal').classList.remove('open'); delTarget=null; };
 
-  window._exportData = () => {
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(new Blob([JSON.stringify({licenses,settings},null,2)],{type:'application/json'}));
-    a.download=`re-newly-${new Date().toISOString().split('T')[0]}.json`;
-    a.click(); toast('Data exported.');
-  };
+window._confirmDelete = async () => {
+  try {
+    toast('Deleting…');
+    await deleteDoc(doc(db, `vaults/${currentVault.id}/licenses/${delTarget}`));
+    licenses = licenses.filter(l=>l.id!==delTarget);
+    render(); window._closeModal(); toast('Entry removed.');
+  } catch(e) { toast('Error: '+e.message); }
+};
 
-  window._importData = async (e) => {
-    const file=e.target.files[0]; if(!file) return;
-    const r=new FileReader();
-    r.onload=async ev=>{
-      try {
-        const d=JSON.parse(ev.target.result);
-        if(d.licenses) { for (const lic of d.licenses) await saveLicense(lic); licenses=d.licenses; }
-        if(d.settings) { settings=d.settings; document.getElementById('s-email').value=settings.email||''; await saveSettings(); }
-        render(); toast('Data imported successfully.');
-      } catch { toast('Unable to parse the selected file.'); }
-    };
-    r.readAsText(file); e.target.value='';
-  };
+// Edit
+window._promptEdit = (id) => {
+  const lic = licenses.find(l=>l.id===id); if(!lic) return;
+  editTarget=id;
+  document.getElementById('e-name').value   = lic.name||'';
+  document.getElementById('e-vendor').value = lic.vendor||'';
+  document.getElementById('e-expiry').value = lic.expiry||'';
+  document.getElementById('e-cost').value   = lic.cost||'';
+  document.getElementById('e-seats').value  = lic.seats||'';
+  document.getElementById('e-notes').value  = lic.notes||'';
+  const catSel=document.getElementById('e-cat');
+  [...catSel.options].forEach((o,i)=>{ if(o.value===lic.category) catSel.selectedIndex=i; });
+  document.getElementById('edit-modal').classList.add('open');
+};
+window._closeEditModal = () => { document.getElementById('edit-modal').classList.remove('open'); editTarget=null; };
+window._confirmEdit = async () => {
+  if(!editTarget) return;
+  const name=document.getElementById('e-name').value.trim(), expiry=document.getElementById('e-expiry').value;
+  if(!name||!expiry) { toast('Name and expiry are required.'); return; }
+  const idx=licenses.findIndex(l=>l.id===editTarget); if(idx===-1) return;
+  const eSeats=document.getElementById('e-seats').value.trim();
+  licenses[idx]={...licenses[idx],name,vendor:document.getElementById('e-vendor').value.trim(),expiry,cost:document.getElementById('e-cost').value.trim(),seats:eSeats?parseInt(eSeats):null,notes:document.getElementById('e-notes').value.trim(),category:document.getElementById('e-cat').value};
+  toast('Saving…'); await saveLicense(licenses[idx]); render(); window._closeEditModal(); toast('License updated.');
+};
 
-  // enter key on auth form
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !document.getElementById('auth-screen').classList.contains('hidden')) {
-      window.submitAuth();
-    }
+// Renew
+window._promptRenew = (id) => {
+  const lic=licenses.find(l=>l.id===id); if(!lic) return;
+  renewTarget=id;
+  document.getElementById('renew-modal-name').textContent=lic.name;
+  document.getElementById('r-expiry').value='';
+  document.getElementById('r-cost').value=lic.cost||'';
+  const btn=document.getElementById('renew-confirm-btn');
+  btn.classList.remove('renewed'); btn.querySelector('.renew-btn-text').textContent='✓ Confirm Renewal';
+  btn.onclick=window._confirmRenew;
+  document.getElementById('renew-modal').classList.add('open');
+};
+window._closeRenewModal = () => { document.getElementById('renew-modal').classList.remove('open'); renewTarget=null; };
+window._confirmRenew = async () => {
+  if(!renewTarget) return;
+  const expiry=document.getElementById('r-expiry').value;
+  if(!expiry) { toast('Please enter the new expiry date.'); return; }
+  const idx=licenses.findIndex(l=>l.id===renewTarget); if(idx===-1) return;
+  licenses[idx]={...licenses[idx],expiry,cost:document.getElementById('r-cost').value.trim()||licenses[idx].cost};
+  const btn=document.getElementById('renew-confirm-btn');
+  btn.classList.add('renewed'); btn.querySelector('.renew-btn-text').textContent='✓ Renewed!';
+  toast('Saving…'); await saveLicense(licenses[idx]); render();
+  setTimeout(()=>window._closeRenewModal(),900); toast('License renewed!');
+};
+
+// ── Settings ──────────────────────────────────────────────────────────────
+async function saveGlobalIntervals() {
+  settings.intervals = getSelectedIntervals();
+  await setDoc(doc(db, `vaults/${currentVault.id}/settings/global`), settings);
+  _updateReminderTriggerText();
+}
+
+function getSelectedIntervals() {
+  return [90,60,30,14,7,3,1].filter(d=>{ const el=document.getElementById('rc-'+d); return el&&el.classList.contains('active'); });
+}
+
+function _updateReminderTriggerText() {
+  const selected=getSelectedIntervals();
+  const el=document.getElementById('reminder-trigger-text'); if(!el) return;
+  el.textContent = selected.length===0 ? 'No reminders set' : selected.map(d=>d===1?'1 day':d+' days').join(', ')+' before expiry';
+}
+
+window._initReminderDropdown = function() {
+  const intervals=settings.intervals||[60,30,7];
+  [90,60,30,14,7,3,1].forEach(d=>{ const c=document.getElementById('rc-'+d); if(c) c.classList.toggle('active',intervals.includes(d)); });
+  document.querySelectorAll('.reminder-option').forEach(opt=>{
+    opt.onclick=async()=>{ const d=+opt.dataset.d; const c=document.getElementById('rc-'+d); if(!c) return; c.classList.toggle('active'); await saveGlobalIntervals(); };
   });
+  _updateReminderTriggerText();
+  document.addEventListener('click', e=>{
+    const wrap=document.getElementById('reminder-dropdown-wrap');
+    if(wrap&&!wrap.contains(e.target)){ document.getElementById('reminder-dropdown-menu')?.classList.remove('open'); document.getElementById('reminder-dropdown-trigger')?.classList.remove('open'); }
+  });
+};
+
+window._toggleReminderDropdown = function() {
+  document.getElementById('reminder-dropdown-menu').classList.toggle('open');
+  document.getElementById('reminder-dropdown-trigger').classList.toggle('open');
+};
+
+// ── Members ───────────────────────────────────────────────────────────────
+async function loadMembers() {
+  try {
+    const snap = await getDocs(collection(db, `vaults/${currentVault.id}/members`));
+    members = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderMembers();
+  } catch(e) {}
+}
+
+function renderMembers() {
+  const el=document.getElementById('members-list');
+  if (!members.length) { el.innerHTML='<div class="members-empty">No members yet. Invite someone to share this vault.</div>'; return; }
+  el.innerHTML=members.map(m=>{
+    const initials=(m.email||'?').slice(0,2).toUpperCase();
+    const badgeClass=m.status==='pending'?'badge-pending':m.role==='editor'?'badge-editor-m':'badge-viewer';
+    const badgeLabel=m.status==='pending'?'Pending':m.role==='editor'?'Editor':'Viewer';
+    return `<div class="member-row">
+      <div class="member-avatar">${initials}</div>
+      <div class="member-info"><div class="member-email">${esc(m.email)}</div><div class="member-meta">Invited ${m.invitedAt?new Date(m.invitedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):''}</div></div>
+      <span class="member-badge ${badgeClass}">${badgeLabel}</span>
+      <button class="member-remove" onclick="window._removeMember('${m.id}')">Revoke</button>
+    </div>`;
+  }).join('');
+}
+
+window._openInviteModal = () => {
+  document.getElementById('inv-email').value='';
+  _selectRole('viewer');
+  document.getElementById('invite-modal').classList.add('open');
+};
+window._closeInviteModal = () => document.getElementById('invite-modal').classList.remove('open');
+
+window._selectRole = (role) => {
+  selectedRole=role;
+  ['viewer','editor'].forEach(r=>{ document.getElementById('role-'+r).classList.toggle('active',r===role); document.getElementById('role-check-'+r).classList.toggle('active',r===role); });
+};
+
+window._sendInvite = async () => {
+  const email=document.getElementById('inv-email').value.trim().toLowerCase();
+  if (!email||!email.includes('@')) { toast('Please enter a valid email address.'); return; }
+  if (email===currentUser.email) { toast("You can't invite yourself."); return; }
+  if (members.find(m=>m.email===email)) { toast('This person is already a member.'); return; }
+  toast('Sending invitation…');
+  try {
+    const token=uid()+uid();
+    const memberId=uid();
+    const memberData={ email, role:selectedRole, status:'pending', invitedAt:new Date().toISOString(), token, memberId };
+    await setDoc(doc(db,`vaults/${currentVault.id}/members/${memberId}`), memberData);
+    await setDoc(doc(db,`invites/${token}`),{
+      vaultId:currentVault.id, vaultName:currentVault.name,
+      ownerId:currentUser.uid, ownerEmail:currentUser.email,
+      ownerName:currentUser.displayName||currentUser.email,
+      memberId, email, role:selectedRole, createdAt:new Date().toISOString()
+    });
+    await sendInviteEmail(email, currentUser.displayName||currentUser.email, currentVault.name, selectedRole, `https://re-newly.com/accept-invite.html?token=${token}`);
+    members.push({id:memberId,...memberData});
+    renderMembers();
+    window._closeInviteModal();
+    toast('Invitation sent to '+email);
+  } catch(e) { toast('Error: '+e.message); }
+};
+
+async function sendInviteEmail(toEmail, fromName, vaultName, role, acceptUrl) {
+  const roleLabel=role==='editor'?'full access (view & edit)':'view-only access';
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f2ece0;font-family:'Helvetica Neue',Arial,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 20px;background:#f2ece0"><tr><td align="center">
+<table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%">
+  <tr><td style="background:#faf6ef;border:1px solid #ddd5c4;border-radius:10px 10px 0 0;padding:28px 40px;text-align:center;border-bottom:none">
+    <div><span style="font-size:26px;font-family:Georgia,serif;font-style:italic;color:#6b5335">re-</span><span style="font-size:26px;font-family:Georgia,serif;color:#1e1a14">newly</span></div>
+    <div style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#b8ad9e;margin-top:4px">LICENSE TRACKER</div>
+  </td></tr>
+  <tr><td style="background:#faf6ef;border-left:1px solid #ddd5c4;border-right:1px solid #ddd5c4;padding:32px 40px">
+    <h2 style="margin:0 0 12px;font-family:Georgia,serif;font-size:22px;font-weight:400;color:#1e1a14">You've been invited</h2>
+    <p style="font-size:13px;color:#8a7f72;font-weight:300;margin:0 0 20px;line-height:1.7"><strong style="color:#1e1a14">${fromName}</strong> has invited you to access the <strong style="color:#1e1a14">"${vaultName}"</strong> vault with <strong style="color:#1e1a14">${roleLabel}</strong>.</p>
+    <div style="text-align:center;margin-bottom:20px"><a href="${acceptUrl}" style="display:inline-block;padding:14px 32px;background:#6b5335;color:#faf6ef;text-decoration:none;border-radius:7px;font-size:13px;font-weight:600">Accept Invitation →</a></div>
+    <p style="font-size:11px;color:#b8ad9e;text-align:center;margin:0">If you don't have an account, you'll be asked to create one.</p>
+  </td></tr>
+  <tr><td style="background:#f5f0e6;border:1px solid #ddd5c4;border-top:none;border-radius:0 0 10px 10px;padding:20px 40px;text-align:center">
+    <p style="margin:0;font-size:11px;color:#b8ad9e">© 2026 Karam Al-Ramahi · <a href="https://re-newly.com" style="color:#6b5335;text-decoration:none">re-newly.com</a></p>
+  </td></tr>
+</table></td></tr></table></body></html>`;
+  const res=await fetch('https://renewly-reminders.karumgg1.workers.dev/send-invite',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:toEmail,fromName,html})});
+  if (!res.ok) throw new Error('Could not send email');
+}
+
+window._removeMember = async (memberId) => {
+  if (!confirm("Revoke this member's access?")) return;
+  await deleteDoc(doc(db,`vaults/${currentVault.id}/members/${memberId}`));
+  members=members.filter(m=>m.id!==memberId);
+  renderMembers(); toast('Access revoked.');
+};
+
+// ── Auth enter key ────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key==='Enter' && !document.getElementById('auth-screen').classList.contains('hidden')) window.submitAuth();
+});
 </script>
 </body>
 </html>

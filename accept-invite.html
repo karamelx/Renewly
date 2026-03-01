@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accept Invitation · re-newly</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%236b5335'/%3E%3Ctext x='3' y='25' font-family='Georgia,serif' font-size='23' font-style='italic' font-weight='400' fill='%23faf6ef' letter-spacing='-1'%3Ere%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f2ece0; --surface: #faf6ef; --surface2: #f5f0e6;
+    --border: #ddd5c4; --text: #1e1a14; --muted: #8a7f72;
+    --faint: #b8ad9e; --accent: #6b5335; --accent-h: #5a4429;
+    --ok: #2e6b50; --danger: #9e3d3a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; width: 100%; max-width: 440px; overflow: hidden; }
+  .card-header { padding: 32px 36px 24px; text-align: center; background: var(--surface2); border-bottom: 1px solid var(--border); }
+  .logo { margin-bottom: 20px; }
+  .card-body { padding: 32px 36px; }
+  h2 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 400; margin-bottom: 8px; }
+  p { font-size: 13px; color: var(--muted); font-weight: 300; line-height: 1.7; margin-bottom: 20px; }
+  .invite-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin-bottom: 24px; }
+  .invite-box .label { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
+  .invite-box .value { font-size: 14px; font-weight: 500; color: var(--text); }
+  .invite-box .sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .field { margin-bottom: 16px; }
+  label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); font-family: 'Outfit', sans-serif; font-size: 13px; color: var(--text); outline: none; transition: border-color 0.15s; }
+  input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(107,83,53,0.08); }
+  .btn { width: 100%; padding: 12px; border-radius: 7px; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; }
+  .btn-primary { background: var(--accent); color: #faf6ef; }
+  .btn-primary:hover { background: var(--accent-h); }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+  .auth-tabs { display: flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
+  .auth-tab { flex: 1; padding: 9px; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; border: none; background: transparent; cursor: pointer; color: var(--muted); transition: all 0.15s; }
+  .auth-tab.active { background: var(--accent); color: #faf6ef; }
+  .error { background: rgba(158,61,58,0.06); border: 1px solid rgba(158,61,58,0.2); border-radius: 6px; padding: 10px 14px; font-size: 12px; color: var(--danger); margin-bottom: 16px; display: none; }
+  .error.show { display: block; }
+  .success-state { text-align: center; padding: 12px 0; }
+  .success-icon { font-size: 48px; margin-bottom: 16px; }
+  .spinner { width: 36px; height: 36px; border: 2.5px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #loading-state, #error-state, #auth-state, #success-state { display: none; }
+  #loading-state.show, #error-state.show, #auth-state.show, #success-state.show { display: block; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="card-header">
+    <div class="logo">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 44" height="40">
+        <g transform="translate(20,22)">
+          <circle cx="0" cy="0" r="14" fill="none" stroke="#ddd5c4" stroke-width="1"/>
+          <path d="M 0,-11 A 11,11 0 1,1 -7.8,7.8" fill="none" stroke="#6b5335" stroke-width="2" stroke-linecap="round"/>
+          <g transform="translate(-7.8,7.8) rotate(-40)"><polygon points="0,-3.5 -2.5,2 2.5,2" fill="#6b5335"/></g>
+          <circle cx="0" cy="-11" r="1.8" fill="#6b5335"/>
+        </g>
+        <g transform="translate(42,0)">
+          <text font-family="'Playfair Display', Georgia, serif" font-size="28" font-weight="400" y="30">
+            <tspan fill="#6b5335" font-style="italic">re-</tspan><tspan fill="#1e1a14">newly</tspan>
+          </text>
+          <line x1="1" y1="36" x2="188" y2="36" stroke="#ddd5c4" stroke-width="0.8"/>
+          <text x="2" y="44" font-family="'Outfit', sans-serif" font-size="7.5" font-weight="500" fill="#b8ad9e" letter-spacing="3.5">LICENSE TRACKER</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <!-- Loading -->
+    <div id="loading-state" class="show">
+      <div class="spinner"></div>
+      <p style="text-align:center;margin:0">Verifying your invitation…</p>
+    </div>
+
+    <!-- Error -->
+    <div id="error-state">
+      <h2>Invalid Invitation</h2>
+      <p>This invitation link is invalid or has already been used. Please ask the vault owner to send a new invite.</p>
+      <a href="/" style="display:block;padding:12px;background:var(--accent);color:#faf6ef;text-align:center;border-radius:7px;text-decoration:none;font-size:13px;font-weight:600">Go to re-newly →</a>
+    </div>
+
+    <!-- Auth -->
+    <div id="auth-state">
+      <h2>Accept Invitation</h2>
+      <p id="invite-description" style="margin-bottom:16px"></p>
+      <div class="invite-box" id="invite-box"></div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+        <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Create Account</button>
+      </div>
+      <div class="error" id="auth-error"></div>
+      <div class="field"><label>Email</label><input type="email" id="auth-email" placeholder="you@company.com"></div>
+      <div class="field" style="margin-bottom:24px"><label>Password</label><input type="password" id="auth-password" placeholder="••••••••"></div>
+      <button class="btn btn-primary" id="submit-btn" onclick="submitAuth()">Sign In & Accept</button>
+    </div>
+
+    <!-- Success -->
+    <div id="success-state" class="success-state">
+      <div class="success-icon">🎉</div>
+      <h2 style="margin-bottom:8px">Access Granted!</h2>
+      <p>You now have access to the shared vault. Redirecting you to re-newly…</p>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBxSpcb3DMtv7UWStqrxA9xULASE7eE_kI",
+    authDomain: "renewly-af1de.firebaseapp.com",
+    projectId: "renewly-af1de",
+    storageBucket: "renewly-af1de.firebasestorage.app",
+    messagingSenderId: "730729566841",
+    appId: "1:730729566841:web:7d45d0a548e4800b14faa8"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const db   = getFirestore(app);
+  const auth = getAuth(app);
+
+  const params = new URLSearchParams(window.location.search);
+  const token  = params.get('token');
+  let inviteData = null;
+
+  function show(id) {
+    ['loading-state','error-state','auth-state','success-state'].forEach(s => {
+      document.getElementById(s).classList.toggle('show', s === id);
+    });
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('auth-error');
+    el.textContent = msg; el.classList.add('show');
+  }
+
+  // Load invite
+  async function loadInvite() {
+    if (!token) { show('error-state'); return; }
+    try {
+      const snap = await getDoc(doc(db, `invites/${token}`));
+      if (!snap.exists()) { show('error-state'); return; }
+      inviteData = snap.data();
+      const roleLabel = inviteData.role === 'editor' ? 'Full Access (view & edit)' : 'View Only';
+      document.getElementById('invite-description').textContent =
+        `${inviteData.ownerName} has invited you to access their license vault.`;
+      document.getElementById('invite-box').innerHTML = `<div class="label">Vault</div><div class="value">${inviteData.vaultName||'License Vault'}</div><div class="label" style="margin-top:10px">Shared by</div><div class="value">${inviteData.ownerName}</div><div class="sub" style="margin-top:4px">Access level: ${roleLabel}</div>`;
+      document.getElementById('auth-email').value = inviteData.email;
+      show('auth-state');
+    } catch(e) { show('error-state'); }
+  }
+
+  window.switchTab = (tab) => {
+    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+    document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+    document.getElementById('submit-btn').textContent = tab === 'login' ? 'Sign In & Accept' : 'Create Account & Accept';
+  };
+
+  window.submitAuth = async () => {
+    const email    = document.getElementById('auth-email').value.trim();
+    const password = document.getElementById('auth-password').value;
+    const isLogin  = document.getElementById('tab-login').classList.contains('active');
+    if (!email || !password) { showError('Please fill in all fields.'); return; }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true; btn.textContent = 'Please wait…';
+
+    try {
+      let userCred;
+      if (isLogin) {
+        userCred = await signInWithEmailAndPassword(auth, email, password);
+      } else {
+        userCred = await createUserWithEmailAndPassword(auth, email, password);
+        // Create user doc
+        await setDoc(doc(db, `users/${userCred.user.uid}`), {
+          email: userCred.user.email,
+          displayName: '',
+          createdAt: new Date().toISOString()
+        });
+      }
+      await acceptInvite(userCred.user);
+    } catch(e) {
+      btn.disabled = false;
+      btn.textContent = isLogin ? 'Sign In & Accept' : 'Create Account & Accept';
+      const msgs = {
+        'auth/invalid-credential': 'Invalid email or password.',
+        'auth/email-already-in-use': 'An account already exists. Please sign in instead.',
+        'auth/weak-password': 'Password must be at least 6 characters.',
+      };
+      showError(msgs[e.code] || e.message);
+    }
+  };
+
+  async function acceptInvite(user) {
+    try {
+      // Write active member to vault
+      await setDoc(doc(db, `vaults/${inviteData.vaultId}/members/${user.uid}`), {
+        email: user.email,
+        role: inviteData.role,
+        status: 'active',
+        invitedAt: inviteData.createdAt,
+        acceptedAt: new Date().toISOString()
+      });
+
+      // Remove the pending entry (keyed by memberId)
+      if (inviteData.memberId && inviteData.memberId !== user.uid) {
+        try {
+          const { deleteDoc: dd } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+          await dd(doc(db, `vaults/${inviteData.vaultId}/members/${inviteData.memberId}`));
+        } catch(e) {}
+      }
+
+      show('success-state');
+      setTimeout(() => { window.location.href = '/'; }, 2200);
+    } catch(e) {
+      showError('Could not activate your access. Please try again.');
+      document.getElementById('submit-btn').disabled = false;
+    }
+  }
+
+  // If already signed in, accept immediately
+  onAuthStateChanged(auth, async (user) => {
+    if (user && inviteData) {
+      await acceptInvite(user);
+    }
+  });
+
+  loadInvite();
+</script>
+</body>
+</html>
