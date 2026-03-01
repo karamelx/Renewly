@@ -967,9 +967,8 @@ function showScreen(name, vaultId) {
   document.getElementById('vault-screen').classList.toggle('show', name==='vault');
   if (name === 'vault' && vaultId) {
     history.replaceState(null, '', `#vault/${vaultId}`);
-  } else {
-    history.replaceState(null, '', window.location.pathname);
   }
+  // Do NOT clear hash here — goToDashboard handles that explicitly
 }
 
 // ── Create Vault ──────────────────────────────────────────────────────────
