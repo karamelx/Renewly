@@ -349,6 +349,45 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
   .insights-row{grid-template-columns:1fr;}
 }
 
+
+/* ACTIVITY LOG */
+.activity-list{max-height:340px;overflow-y:auto;}
+.activity-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.activity-item:last-child{border-bottom:none;}
+.activity-icon{width:28px;height:28px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:1px;}
+.activity-body{flex:1;min-width:0;}
+.activity-text{font-size:12px;color:var(--text);line-height:1.5;}
+.activity-text strong{font-weight:600;}
+.activity-meta{font-size:11px;color:var(--faint);margin-top:2px;}
+.activity-empty{font-size:12px;color:var(--faint);font-style:italic;text-align:center;padding:24px 0;}
+
+/* COMMENTS */
+.comment-thread{margin-top:0;}
+.comment-item{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);}
+.comment-item:last-child{border-bottom:none;}
+.comment-avatar{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#faf6ef;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.comment-body{flex:1;min-width:0;}
+.comment-header{display:flex;align-items:baseline;gap:8px;margin-bottom:3px;}
+.comment-author{font-size:12px;font-weight:600;color:var(--text);}
+.comment-time{font-size:10px;color:var(--faint);}
+.comment-text{font-size:13px;color:var(--text);line-height:1.5;}
+.comment-text .mention{color:var(--accent);font-weight:600;}
+.comment-delete{margin-left:auto;padding:2px 6px;border-radius:3px;border:none;background:transparent;color:var(--faint);font-size:10px;cursor:pointer;transition:color .1s;flex-shrink:0;}
+.comment-delete:hover{color:var(--danger);}
+.comment-input-wrap{display:flex;gap:8px;margin-top:12px;align-items:flex-end;}
+.comment-input{flex:1;padding:9px 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg);font-family:'Outfit',sans-serif;font-size:13px;color:var(--text);outline:none;resize:none;min-height:38px;transition:border-color .15s;}
+.comment-input:focus{border-color:var(--accent);}
+.comment-submit{padding:9px 16px;border-radius:6px;border:none;background:var(--accent);color:#faf6ef;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;transition:background .15s;}
+.comment-submit:hover{background:var(--accent-h);}
+.mention-hint{font-size:10px;color:var(--faint);margin-top:4px;}
+
+/* LICENSE ROW COMMENT INDICATOR */
+.comment-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--faint);padding:2px 6px;border-radius:3px;background:var(--surface2);border:1px solid var(--border);}
+
+/* TRANSFER OWNERSHIP */
+.transfer-section{margin-top:16px;padding-top:16px;border-top:1px solid var(--border);}
+.transfer-label{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--faint);margin-bottom:10px;}
+
 /* DARK MODE TOGGLE */
 .dark-toggle{width:36px;height:20px;border-radius:10px;background:var(--border);border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
 .dark-toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--surface);transition:transform .2s,background .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
@@ -651,6 +690,17 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
         <div class="settings-body">
           <p style="font-size:12px;color:var(--muted);font-weight:300;margin-bottom:16px;">Invite teammates to view or manage this vault. They'll receive an email invitation.</p>
           <div id="members-list"><div class="members-empty">No members yet. Invite someone to share this vault.</div></div>
+
+          <div class="transfer-section" id="transfer-section">
+            <div class="transfer-label">Transfer Ownership</div>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Transfer this vault to an active member. You'll become an editor.</p>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <select id="transfer-select" style="flex:1;min-width:160px;padding:8px 12px;border:1px solid var(--border);border-radius:5px;background:var(--bg);font-family:'Outfit',sans-serif;font-size:13px;color:var(--text);outline:none;">
+                <option value="">Select a member…</option>
+              </select>
+              <button class="btn btn-ghost btn-sm" onclick="_promptTransfer()">Transfer →</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -709,6 +759,16 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
             </div>
           </div>
           <div class="cal-grid" id="cal-grid"></div>
+        </div>
+      </div>
+
+      <!-- ACTIVITY LOG (owner + editors) -->
+      <div class="settings-panel" id="activity-panel" style="display:none">
+        <div class="settings-panel-header">Activity Log</div>
+        <div class="settings-body">
+          <div class="activity-list" id="activity-list">
+            <div class="activity-empty">No activity yet.</div>
+          </div>
         </div>
       </div>
 
@@ -833,6 +893,46 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
     <div class="modal-footer">
       <button class="btn btn-danger" onclick="_confirmDeleteVault()">Delete Vault</button>
       <button class="btn btn-ghost" onclick="document.getElementById('del-vault-modal').classList.remove('open')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMMENTS MODAL -->
+<div class="overlay" id="comments-modal">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <h3>Comments</h3>
+      <p style="font-size:13px;color:var(--muted);font-weight:300;margin-top:4px" id="comments-license-name"></p>
+    </div>
+    <div class="modal-body" style="padding-bottom:0">
+      <div class="comment-thread" id="comment-thread"></div>
+      <div class="comment-input-wrap">
+        <textarea class="comment-input" id="comment-input" placeholder="Add a comment… use @name to mention a member" rows="2" onkeydown="_commentKeydown(event)"></textarea>
+        <button class="comment-submit" onclick="_submitComment()">Post</button>
+      </div>
+      <div class="mention-hint">Tip: type @name to notify a vault member</div>
+    </div>
+    <div class="modal-footer" style="padding-top:12px">
+      <button class="btn btn-ghost" onclick="document.getElementById('comments-modal').classList.remove('open')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRANSFER OWNERSHIP MODAL -->
+<div class="overlay" id="transfer-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Transfer Ownership</h3>
+      <p style="font-size:13px;color:var(--muted);font-weight:300;margin-top:6px">This cannot be undone. You will become an editor of this vault.</p>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:14px 16px;font-size:13px;color:var(--muted);">
+        Transfer ownership of <strong id="transfer-vault-name" style="color:var(--text)"></strong> to <strong id="transfer-to-name" style="color:var(--text)"></strong>?
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" onclick="_confirmTransfer()">Yes, Transfer Ownership</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('transfer-modal').classList.remove('open')">Cancel</button>
     </div>
   </div>
 </div>
@@ -1155,6 +1255,8 @@ window.openVault = async (vaultId, role) => {
 
   // Show/hide members panel (owner only)
   document.getElementById('vault-members-panel').style.display = role === 'owner' ? 'block' : 'none';
+  document.getElementById('activity-panel').style.display = (role === 'owner' || role === 'editor') ? 'block' : 'none';
+  if (role === 'owner' || role === 'editor') loadActivityLog();
   document.getElementById('reminder-panel').style.display = 'block';
 
   // Load settings for this vault
@@ -1249,6 +1351,7 @@ window._confirmCreateVault = async () => {
     document.getElementById('add-form').classList.remove('open');
     document.getElementById('vault-members-panel').style.display = 'block';
     document.getElementById('reminder-panel').style.display = 'block';
+    document.getElementById('activity-panel').style.display = 'block';
     document.getElementById('search-input').value = '';
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter==='all'));
     _updateReminderTriggerText();
@@ -1343,6 +1446,9 @@ function render() {
         <div class="row-cell">${seats}</div>
         <div><span class="status-tag ${s.tag}"><span class="tag-dot"></span>${s.label}</span><div class="days-count ${s.dc}">${s.dtext}</div></div>
         <div class="row-actions">
+          <button class="btn-icon" title="Comments" onclick="window._openComments('${lic.id}')" style="position:relative">
+            💬${(lic.commentCount&&lic.commentCount>0)?`<span style='position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:var(--accent);color:#faf6ef;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;'>${lic.commentCount}</span>`:''}
+          </button>
           ${canEdit ? `<button class="btn-renew" onclick="window._promptRenew('${lic.id}')">↻ Renew</button>` : ''}
           ${canEdit ? `<button class="btn-icon" title="Edit" onclick="window._promptEdit('${lic.id}')">✎</button>` : ''}
           ${canEdit ? `<button class="btn-icon" title="Delete" onclick="window._promptDelete('${lic.id}')">✕</button>` : '<span style="font-size:11px;color:var(--faint)">View only</span>'}
@@ -1375,6 +1481,7 @@ window._addLicense = async () => {
     reminders:[...document.querySelectorAll('#form-chips .chip.on')].map(c=>+c.dataset.d)
   };
   toast('Saving…'); await saveLicense(lic);
+  await logActivity('add', `Added license <strong>${esc(lic.name)}</strong>`, lic.id);
   licenses.push(lic); render();
   ['f-name','f-vendor','f-expiry','f-cost','f-notes','f-seats'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('add-form').classList.remove('open');
@@ -1387,7 +1494,9 @@ window._closeModal   = ()   => { document.getElementById('del-modal').classList.
 window._confirmDelete = async () => {
   try {
     toast('Deleting…');
+    const delLic = licenses.find(l=>l.id===delTarget);
     await deleteDoc(doc(db, `vaults/${currentVault.id}/licenses/${delTarget}`));
+    await logActivity('delete', `Removed license <strong>${esc(delLic?.name||'')}</strong>`);
     licenses = licenses.filter(l=>l.id!==delTarget);
     render(); window._closeModal(); toast('Entry removed.');
   } catch(e) { toast('Error: '+e.message); }
@@ -1415,7 +1524,7 @@ window._confirmEdit = async () => {
   const idx=licenses.findIndex(l=>l.id===editTarget); if(idx===-1) return;
   const eSeats=document.getElementById('e-seats').value.trim();
   licenses[idx]={...licenses[idx],name,vendor:document.getElementById('e-vendor').value.trim(),expiry,cost:document.getElementById('e-cost').value.trim(),seats:eSeats?parseInt(eSeats):null,notes:document.getElementById('e-notes').value.trim(),category:document.getElementById('e-cat').value};
-  toast('Saving…'); await saveLicense(licenses[idx]); render(); window._closeEditModal(); toast('License updated.');
+  toast('Saving…'); await saveLicense(licenses[idx]); await logActivity('edit', `Updated license <strong>${esc(licenses[idx].name)}</strong>`, licenses[idx].id); render(); window._closeEditModal(); toast('License updated.');
 };
 
 // Renew
@@ -1439,7 +1548,7 @@ window._confirmRenew = async () => {
   licenses[idx]={...licenses[idx],expiry,cost:document.getElementById('r-cost').value.trim()||licenses[idx].cost};
   const btn=document.getElementById('renew-confirm-btn');
   btn.classList.add('renewed'); btn.querySelector('.renew-btn-text').textContent='✓ Renewed!';
-  toast('Saving…'); await saveLicense(licenses[idx]); render();
+  toast('Saving…'); await saveLicense(licenses[idx]); await logActivity('renew', `Renewed <strong>${esc(licenses[idx].name)}</strong> → ${expiry}`, licenses[idx].id); render();
   setTimeout(()=>window._closeRenewModal(),900); toast('License renewed!');
 };
 
@@ -1488,6 +1597,7 @@ async function loadMembers() {
 }
 
 function renderMembers() {
+  _updateTransferDropdown();
   const el=document.getElementById('members-list');
   if (!members.length) { el.innerHTML='<div class="members-empty">No members yet. Invite someone to share this vault.</div>'; return; }
   el.innerHTML=members.map(m=>{
@@ -1536,6 +1646,7 @@ window._sendInvite = async () => {
     members.push({id:memberId,...memberData});
     renderMembers();
     window._closeInviteModal();
+    await logActivity('invite', `Invited <strong>${esc(email)}</strong> as ${selectedRole}`);
     toast('Invitation sent to '+email);
   } catch(e) { toast('Error: '+e.message); }
 };
@@ -1580,6 +1691,7 @@ window._removeMember = async (memberId) => {
 
     members = members.filter(m => m.id !== memberId);
     renderMembers();
+    await logActivity('revoke', `Revoked access for <strong>${esc(member?.email||memberId)}</strong>`);
     toast('Access revoked.');
   } catch(e) { toast('Error revoking access: ' + e.message); }
 };
@@ -1654,6 +1766,215 @@ window._sendPasswordReset = async () => {
 };
 
 
+
+
+// ── Activity Log ──────────────────────────────────────────────────────────
+const ACTIVITY_ICONS = { add:'➕', edit:'✎', renew:'↻', delete:'✕', comment:'💬', transfer:'🔁', invite:'📨', revoke:'🚫' };
+
+async function logActivity(type, text, licenseId) {
+  if (!currentVault || !currentUser) return;
+  try {
+    const entry = {
+      type, text,
+      licenseId: licenseId || null,
+      userId: currentUser.uid,
+      userName: currentUser.displayName || currentUser.email,
+      createdAt: new Date().toISOString()
+    };
+    await setDoc(doc(db, `vaults/${currentVault.id}/activity/${uid()}`), entry);
+    // Refresh log if panel visible
+    if (document.getElementById('activity-panel')?.style.display !== 'none') {
+      loadActivityLog();
+    }
+  } catch(e) {}
+}
+
+async function loadActivityLog() {
+  const el = document.getElementById('activity-list');
+  if (!el) return;
+  try {
+    const snap = await getDocs(collection(db, `vaults/${currentVault.id}/activity`));
+    const items = snap.docs.map(d => d.data()).sort((a,b) => b.createdAt.localeCompare(a.createdAt)).slice(0,50);
+    if (!items.length) { el.innerHTML = '<div class="activity-empty">No activity yet.</div>'; return; }
+    el.innerHTML = items.map(item => {
+      const icon = ACTIVITY_ICONS[item.type] || '•';
+      const time = item.createdAt ? _relTime(item.createdAt) : '';
+      return `<div class="activity-item">
+        <div class="activity-icon">${icon}</div>
+        <div class="activity-body">
+          <div class="activity-text">${item.text}</div>
+          <div class="activity-meta">${esc(item.userName)} · ${time}</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { el.innerHTML = '<div class="activity-empty">Could not load activity.</div>'; }
+}
+
+function _relTime(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff/60000);
+  if (mins < 1)  return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins/60);
+  if (hrs < 24)  return `${hrs}h ago`;
+  const days = Math.floor(hrs/24);
+  if (days < 7)  return `${days}d ago`;
+  return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+}
+
+// ── Comments ──────────────────────────────────────────────────────────────
+let commentLicenseId = null;
+let vaultMembers = []; // cached for @mention lookups
+
+window._openComments = async (licId) => {
+  commentLicenseId = licId;
+  const lic = licenses.find(l => l.id === licId);
+  document.getElementById('comments-license-name').textContent = lic ? lic.name : '';
+  document.getElementById('comment-input').value = '';
+  document.getElementById('comments-modal').classList.add('open');
+  await _loadComments(licId);
+};
+
+async function _loadComments(licId) {
+  const thread = document.getElementById('comment-thread');
+  thread.innerHTML = '<div style="font-size:12px;color:var(--faint);padding:12px 0">Loading…</div>';
+  try {
+    const snap = await getDocs(collection(db, `vaults/${currentVault.id}/licenses/${licId}/comments`));
+    const items = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => a.createdAt.localeCompare(b.createdAt));
+    if (!items.length) { thread.innerHTML = '<div class="activity-empty">No comments yet. Be the first!</div>'; return; }
+    thread.innerHTML = items.map(c => {
+      const initials = (c.userName||'?').slice(0,2).toUpperCase();
+      const canDel = c.userId === currentUser.uid || currentVault.role === 'owner';
+      const text = _renderMentions(esc(c.text));
+      return `<div class="comment-item" id="comment-${c.id}">
+        <div class="comment-avatar">${initials}</div>
+        <div class="comment-body">
+          <div class="comment-header">
+            <span class="comment-author">${esc(c.userName)}</span>
+            <span class="comment-time">${_relTime(c.createdAt)}</span>
+            ${canDel ? `<button class="comment-delete" onclick="_deleteComment('${licId}','${c.id}')">✕</button>` : ''}
+          </div>
+          <div class="comment-text">${text}</div>
+        </div>
+      </div>`;
+    }).join('');
+    // Update comment count on license
+    const lic = licenses.find(l => l.id === licId);
+    if (lic) lic.commentCount = items.length;
+  } catch(e) { thread.innerHTML = '<div class="activity-empty">Could not load comments.</div>'; }
+}
+
+function _renderMentions(text) {
+  return text.replace(/@([\w.-]+)/g, '<span class="mention">@$1</span>');
+}
+
+window._submitComment = async () => {
+  const input = document.getElementById('comment-input');
+  const text = input.value.trim();
+  if (!text || !commentLicenseId) return;
+
+  const btn = document.querySelector('#comments-modal .comment-submit');
+  btn.disabled = true;
+
+  try {
+    const commentId = uid();
+    const comment = {
+      text,
+      userId: currentUser.uid,
+      userName: currentUser.displayName || currentUser.email,
+      createdAt: new Date().toISOString()
+    };
+    await setDoc(doc(db, `vaults/${currentVault.id}/licenses/${commentLicenseId}/comments/${commentId}`), comment);
+
+    // Log to activity
+    const lic = licenses.find(l => l.id === commentLicenseId);
+    await logActivity('comment', `Commented on <strong>${esc(lic?.name||'')}</strong>: "${text.slice(0,60)}${text.length>60?'…':''}"`, commentLicenseId);
+
+    input.value = '';
+    await _loadComments(commentLicenseId);
+    render(); // update comment badge count
+  } catch(e) { toast('Error posting comment: ' + e.message); }
+  btn.disabled = false;
+};
+
+window._deleteComment = async (licId, commentId) => {
+  try {
+    await deleteDoc(doc(db, `vaults/${currentVault.id}/licenses/${licId}/comments/${commentId}`));
+    const lic = licenses.find(l => l.id === licId);
+    if (lic && lic.commentCount > 0) lic.commentCount--;
+    await _loadComments(licId);
+    render();
+  } catch(e) { toast('Error: ' + e.message); }
+};
+
+window._commentKeydown = (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); _submitComment(); }
+};
+
+// ── Transfer Ownership ────────────────────────────────────────────────────
+let transferTarget = null;
+
+window._promptTransfer = () => {
+  const sel = document.getElementById('transfer-select');
+  const memberId = sel.value;
+  const memberEmail = sel.options[sel.selectedIndex]?.text;
+  if (!memberId) { toast('Select a member to transfer to.'); return; }
+  transferTarget = { memberId, memberEmail };
+  document.getElementById('transfer-vault-name').textContent = currentVault.name;
+  document.getElementById('transfer-to-name').textContent = memberEmail;
+  document.getElementById('transfer-modal').classList.add('open');
+};
+
+window._confirmTransfer = async () => {
+  if (!transferTarget) return;
+  const { memberId, memberEmail } = transferTarget;
+  try {
+    // Update vault owner
+    await setDoc(doc(db, `vaults/${currentVault.id}`), { ownerId: memberId }, { merge: true });
+
+    // Move vault ref from old owner to new owner in /users
+    await setDoc(doc(db, `users/${memberId}/vaults/${currentVault.id}`), {
+      name: currentVault.name, createdAt: currentVault.createdAt || new Date().toISOString()
+    });
+    await deleteDoc(doc(db, `users/${currentUser.uid}/vaults/${currentVault.id}`));
+
+    // Demote old owner to editor in members
+    await setDoc(doc(db, `vaults/${currentVault.id}/members/${currentUser.uid}`), {
+      email: currentUser.email,
+      role: 'editor',
+      status: 'active',
+      acceptedAt: new Date().toISOString()
+    });
+
+    // Remove new owner from members (they are now the owner)
+    await deleteDoc(doc(db, `vaults/${currentVault.id}/members/${memberId}`));
+    // Also remove their sharedVaults ref
+    try { await deleteDoc(doc(db, `users/${memberId}/sharedVaults/${currentVault.id}`)); } catch(e) {}
+
+    await logActivity('transfer', `Transferred ownership to <strong>${esc(memberEmail)}</strong>`);
+
+    document.getElementById('transfer-modal').classList.remove('open');
+    transferTarget = null;
+    toast('Ownership transferred. You are now an editor.');
+
+    // Reload dashboard since this vault's ownership changed
+    await goToDashboard();
+  } catch(e) { toast('Error: ' + e.message); }
+};
+
+// Populate transfer dropdown when members load
+function _updateTransferDropdown() {
+  const sel = document.getElementById('transfer-select');
+  if (!sel) return;
+  const active = members.filter(m => m.status === 'active');
+  if (!active.length) {
+    document.getElementById('transfer-section').style.display = 'none';
+    return;
+  }
+  document.getElementById('transfer-section').style.display = 'block';
+  sel.innerHTML = '<option value="">Select a member…</option>' +
+    active.map(m => `<option value="${m.id}">${esc(m.email)}</option>`).join('');
+}
 
 // ── Insights ──────────────────────────────────────────────────────────────
 let insightsVaultFilter = 'all'; // 'all' or vaultId
