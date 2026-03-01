@@ -708,6 +708,20 @@
         c.onclick = () => { c.classList.toggle('on'); window._saveGlobalIntervals(); };
       });
       document.querySelectorAll('#form-chips .chip').forEach(c => { c.onclick = () => c.classList.toggle('on'); });
+
+      // Ensure user document exists so the reminder Worker can find this user
+      try {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        if (!userDocSnap.exists()) {
+          await setDoc(userDocRef, {
+            email: user.email,
+            displayName: user.displayName || '',
+            createdAt: new Date().toISOString()
+          });
+        }
+      } catch(e) { console.warn('Could not create user doc:', e); }
+
       await loadData();
     } else {
       currentUser = null;
