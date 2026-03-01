@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>re-newly</title>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%236b5335'/%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='rgba(255,255,255,0.2)' stroke-width='1'/%3E%3Cpath d='M 16,4 A 12,12 0 1,1 7.5,23.4' fill='none' stroke='%23faf6ef' stroke-width='2.2' stroke-linecap='round'/%3E%3Cg transform='translate(7.5,23.4) rotate(-40)'%3E%3Cpolygon points='0,-4 -3,2.5 3,2.5' fill='%23faf6ef'/%3E%3C/g%3E%3Ccircle cx='16' cy='4' r='2' fill='%23faf6ef'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg:        #f2ece0;
@@ -33,6 +34,95 @@
     line-height: 1.5;
   }
 
+  /* AUTH SCREEN */
+  .auth-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .auth-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 420px;
+    overflow: hidden;
+  }
+  .auth-header {
+    padding: 36px 36px 28px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .auth-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .auth-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .auth-subtitle { font-size: 13px; color: var(--muted); font-weight: 300; }
+  .auth-body { padding: 28px 36px 36px; }
+  .auth-tabs {
+    display: flex;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .auth-tab {
+    flex: 1; padding: 9px; text-align: center;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    background: var(--bg); color: var(--muted);
+    border: none; font-family: 'Outfit', sans-serif;
+    transition: all 0.15s;
+  }
+  .auth-tab.active { background: var(--accent); color: #faf6ef; }
+  .auth-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .auth-field label { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+  .auth-field input {
+    font-family: 'Outfit', sans-serif; font-size: 13px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 5px; padding: 10px 14px; color: var(--text);
+    outline: none; transition: border-color 0.15s;
+  }
+  .auth-field input:focus { border-color: var(--accent); }
+  .auth-field input::placeholder { color: var(--faint); }
+  .auth-btn {
+    width: 100%; padding: 11px; border-radius: 5px; border: none;
+    font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all 0.15s; margin-bottom: 10px;
+  }
+  .auth-btn-primary { background: var(--accent); color: #faf6ef; }
+  .auth-btn-primary:hover { background: var(--accent-h); }
+  .auth-btn-google {
+    background: var(--surface); color: var(--text);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .auth-btn-google:hover { border-color: var(--border2); background: var(--surface2); }
+  .auth-divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 16px 0; color: var(--faint); font-size: 12px;
+  }
+  .auth-divider::before, .auth-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  .auth-error {
+    background: rgba(158,61,58,0.08); border: 1px solid rgba(158,61,58,0.2);
+    color: var(--danger); border-radius: 5px; padding: 10px 14px;
+    font-size: 12px; margin-bottom: 16px; display: none;
+  }
+  .auth-error.show { display: block; }
+
   /* NAV */
   .topnav {
     background: var(--surface);
@@ -47,15 +137,9 @@
     z-index: 40;
   }
   .nav-brand { display: flex; align-items: center; gap: 10px; }
-  .nav-logo {
-    width: 28px; height: 28px;
-    background: var(--accent); border-radius: 4px;
-    display: flex; align-items: center; justify-content: center;
-    color: #faf6ef; font-size: 13px; font-weight: 600; letter-spacing: -0.5px;
-  }
-  .nav-title { font-weight: 600; font-size: 15px; letter-spacing: 0.2px; }
   .nav-right { display: flex; align-items: center; gap: 8px; }
   .nav-date { font-size: 12px; color: var(--muted); padding-right: 16px; border-right: 1px solid var(--border); margin-right: 4px; }
+  .nav-user { font-size: 12px; color: var(--muted); padding-right: 12px; border-right: 1px solid var(--border); margin-right: 4px; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
   /* LAYOUT */
   .page { max-width: 1000px; margin: 0 auto; padding: 40px 48px 80px; }
@@ -248,6 +332,9 @@
   .toast { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: var(--surface); padding: 10px 18px; border-radius: 5px; font-size: 12px; font-weight: 500; z-index: 100; opacity: 0; transform: translateY(10px); transition: all 0.18s; pointer-events: none; }
   .toast.show { opacity: 1; transform: translateY(0); }
 
+  /* HIDDEN */
+  .hidden { display: none !important; }
+
   @media (max-width: 720px) {
     .topnav { padding: 0 20px; }
     .page { padding: 24px 20px 60px; }
@@ -262,144 +349,207 @@
 </head>
 <body>
 
-<nav class="topnav">
-  <div class="nav-brand">
-<img src="logo.svg" alt="re-newly" style="height:48px;">
-  </div>
-  <div class="nav-right">
-    <span class="nav-date" id="nav-date"></span>
-    <button class="btn btn-primary btn-sm" onclick="_toggleForm()">+ Add License</button>
-  </div>
-</nav>
-
-<div class="page">
-
-  <div class="page-header">
-    <div>
-      <h1>Your <span>Licenses</span></h1>
-      <p class="page-subtitle">Track, manage, and get reminded before licenses expire.</p>
-    </div>
-  </div>
-
-  <div class="kpi-row">
-    <div class="kpi">
-      <div class="kpi-indicator"></div>
-      <div class="kpi-label">Total</div>
-      <div class="kpi-value" id="k-total">0</div>
-      <div class="kpi-sub">licenses tracked</div>
-    </div>
-    <div class="kpi kpi-danger">
-      <div class="kpi-indicator"></div>
-      <div class="kpi-label">Expired</div>
-      <div class="kpi-value" id="k-expired">0</div>
-      <div class="kpi-sub">action required</div>
-    </div>
-    <div class="kpi kpi-warn">
-      <div class="kpi-indicator"></div>
-      <div class="kpi-label">Expiring Soon</div>
-      <div class="kpi-value" id="k-warn">0</div>
-      <div class="kpi-sub">within 30 days</div>
-    </div>
-    <div class="kpi kpi-ok">
-      <div class="kpi-indicator"></div>
-      <div class="kpi-label">Active</div>
-      <div class="kpi-value" id="k-ok">0</div>
-      <div class="kpi-sub">in good standing</div>
-    </div>
-  </div>
-
-  <!-- FORM -->
-  <div class="form-panel" id="add-form">
-    <div class="form-panel-header">New License Entry</div>
-    <div class="form-body">
-      <div class="form-grid fg-3">
-        <div class="field"><label>License Name *</label><input id="f-name" placeholder="e.g. Adobe Creative Cloud"></div>
-        <div class="field"><label>Vendor</label><input id="f-vendor" placeholder="e.g. Adobe Inc."></div>
-        <div class="field"><label>Category</label>
-          <select id="f-cat">
-            <option>Software</option><option>SaaS</option><option>Domain</option>
-            <option>SSL / Security</option><option>Hardware</option><option>Other</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-grid fg-2">
-        <div class="field"><label>Expiration Date *</label><input type="date" id="f-expiry"></div>
-        <div class="field"><label>Annual Cost</label><input id="f-cost" placeholder="e.g. $299 / year"></div>
-      </div>
-      <div class="chips-group">
-        <label>Reminder Intervals (days before expiry)</label>
-        <div class="chips" id="form-chips">
-          <div class="chip" data-d="90">90 days</div>
-          <div class="chip on" data-d="60">60 days</div>
-          <div class="chip on" data-d="30">30 days</div>
-          <div class="chip" data-d="14">14 days</div>
-          <div class="chip on" data-d="7">7 days</div>
-          <div class="chip" data-d="3">3 days</div>
-          <div class="chip" data-d="1">1 day</div>
-        </div>
-      </div>
-      <div class="field" style="margin-bottom:22px;"><label>Internal Notes</label><input id="f-notes" placeholder="Seat count, account owner, renewal contact…"></div>
-      <div class="form-actions">
-        <button class="btn btn-primary" onclick="_addLicense()">Save Entry</button>
-        <button class="btn btn-ghost" onclick="_toggleForm()">Discard</button>
+<!-- AUTH SCREEN -->
+<div class="auth-screen" id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 44" height="44">
+          <g transform="translate(20,22)">
+            <circle cx="0" cy="0" r="14" fill="none" stroke="#ddd5c4" stroke-width="1"/>
+            <path d="M 0,-11 A 11,11 0 1,1 -7.8,7.8" fill="none" stroke="#6b5335" stroke-width="2" stroke-linecap="round"/>
+            <g transform="translate(-7.8,7.8) rotate(-40)"><polygon points="0,-3.5 -2.5,2 2.5,2" fill="#6b5335"/></g>
+            <circle cx="0" cy="-11" r="1.8" fill="#6b5335"/>
+          </g>
+          <g transform="translate(42,0)">
+            <text font-family="'Playfair Display', Georgia, serif" font-size="28" font-weight="400" y="30">
+              <tspan fill="#6b5335" font-style="italic">re-</tspan><tspan fill="#1e1a14">newly</tspan>
+            </text>
+            <line x1="1" y1="36" x2="188" y2="36" stroke="#ddd5c4" stroke-width="0.8"/>
+            <text x="2" y="44" font-family="'Outfit', sans-serif" font-size="7.5" font-weight="500" fill="#b8ad9e" letter-spacing="3.5">LICENSE TRACKER</text>
+          </g>
+        </svg>
       </div>
     </div>
-  </div>
-
-  <div class="toolbar">
-    <span class="toolbar-left">All Licenses</span>
-    <span style="font-size:12px;color:var(--faint)" id="row-count"></span>
-  </div>
-
-  <div class="table-wrap">
-    <div class="table-head">
-      <div>License</div><div>Category</div><div>Expires</div>
-      <div>Cost</div><div>Status</div><div style="text-align:right">Actions</div>
-    </div>
-    <div id="license-list"></div>
-  </div>
-
-  <div class="settings-panel">
-    <div class="settings-panel-header">Notification Settings</div>
-    <div class="settings-body">
-      <div class="settings-grid">
-        <div class="settings-block">
-          <div>
-            <h4>Recipient Email</h4>
-            <p>Reminders will be sent to this address via your default email client.</p>
-          </div>
-          <div class="field"><input type="email" id="s-email" placeholder="you@company.com" oninput="_saveSettings()"></div>
-        </div>
-        <div class="settings-block">
-          <div>
-            <h4>Default Reminder Schedule</h4>
-            <p>Applied to all licenses unless overridden per entry.</p>
-          </div>
-          <div class="chips" id="global-chips">
-            <div class="chip" data-d="90">90d</div>
-            <div class="chip on" data-d="60">60d</div>
-            <div class="chip on" data-d="30">30d</div>
-            <div class="chip" data-d="14">14d</div>
-            <div class="chip on" data-d="7">7d</div>
-            <div class="chip" data-d="3">3d</div>
-            <div class="chip" data-d="1">1d</div>
-          </div>
-        </div>
+    <div class="auth-body">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+        <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Create Account</button>
       </div>
-    </div>
-    <div class="action-row">
-      <button class="btn btn-primary" onclick="_sendAll()">Send Reminders</button>
-      <div class="divider"></div>
-      <button class="text-link" onclick="_exportData()">Export JSON</button>
-      <button class="text-link" onclick="document.getElementById('imp').click()">Import JSON</button>
-      <input type="file" id="imp" style="display:none" accept=".json" onchange="_importData(event)">
-      <span class="action-row-note">Opens your email client with all due licenses pre-filled</span>
+      <div class="auth-error" id="auth-error"></div>
+      <div class="auth-field">
+        <label>Email</label>
+        <input type="email" id="auth-email" placeholder="you@company.com">
+      </div>
+      <div class="auth-field">
+        <label>Password</label>
+        <input type="password" id="auth-password" placeholder="••••••••">
+      </div>
+      <button class="auth-btn auth-btn-primary" id="auth-submit-btn" onclick="submitAuth()">Sign In</button>
+      <div class="auth-divider">or</div>
+      <button class="auth-btn auth-btn-google" onclick="signInWithGoogle()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/></svg>
+        Continue with Google
+      </button>
     </div>
   </div>
-
 </div>
 
-<!-- MODAL -->
+<!-- MAIN APP -->
+<div id="app-screen" class="hidden">
+  <nav class="topnav">
+    <div class="nav-brand">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 50" height="38" style="display:block">
+        <g transform="translate(22,25)">
+          <circle cx="0" cy="0" r="16" fill="none" stroke="#ddd5c4" stroke-width="1"/>
+          <path d="M 0,-13 A 13,13 0 1,1 -9.2,9.2" fill="none" stroke="#6b5335" stroke-width="2" stroke-linecap="round"/>
+          <g transform="translate(-9.2,9.2) rotate(-40)"><polygon points="0,-4 -3,2.5 3,2.5" fill="#6b5335"/></g>
+          <circle cx="0" cy="-13" r="2" fill="#6b5335"/>
+        </g>
+        <g transform="translate(46,0)">
+          <text font-family="'Playfair Display', Georgia, serif" font-size="26" font-weight="400" y="30">
+            <tspan fill="#6b5335" font-style="italic">re-</tspan><tspan fill="#1e1a14">newly</tspan>
+          </text>
+          <line x1="1" y1="36" x2="194" y2="36" stroke="#ddd5c4" stroke-width="0.8"/>
+          <text x="2" y="47" font-family="'Outfit', sans-serif" font-size="8" font-weight="500" fill="#b8ad9e" letter-spacing="3.5">LICENSE TRACKER</text>
+        </g>
+      </svg>
+    </div>
+    <div class="nav-right">
+      <span class="nav-date" id="nav-date"></span>
+      <span class="nav-user" id="nav-user"></span>
+      <button class="btn btn-ghost btn-sm" onclick="_signOut()">Sign Out</button>
+      <button class="btn btn-primary btn-sm" onclick="_toggleForm()">+ Add License</button>
+    </div>
+  </nav>
+
+  <div class="page">
+    <div class="page-header">
+      <div>
+        <h1>License <span>Renewals</span></h1>
+        <p class="page-subtitle">Track, manage, and get reminded before licenses expire.</p>
+      </div>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-indicator"></div>
+        <div class="kpi-label">Total</div>
+        <div class="kpi-value" id="k-total">0</div>
+        <div class="kpi-sub">licenses tracked</div>
+      </div>
+      <div class="kpi kpi-danger">
+        <div class="kpi-indicator"></div>
+        <div class="kpi-label">Expired</div>
+        <div class="kpi-value" id="k-expired">0</div>
+        <div class="kpi-sub">action required</div>
+      </div>
+      <div class="kpi kpi-warn">
+        <div class="kpi-indicator"></div>
+        <div class="kpi-label">Expiring Soon</div>
+        <div class="kpi-value" id="k-warn">0</div>
+        <div class="kpi-sub">within 30 days</div>
+      </div>
+      <div class="kpi kpi-ok">
+        <div class="kpi-indicator"></div>
+        <div class="kpi-label">Active</div>
+        <div class="kpi-value" id="k-ok">0</div>
+        <div class="kpi-sub">in good standing</div>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <div class="form-panel" id="add-form">
+      <div class="form-panel-header">New License Entry</div>
+      <div class="form-body">
+        <div class="form-grid fg-3">
+          <div class="field"><label>License Name *</label><input id="f-name" placeholder="e.g. Adobe Creative Cloud"></div>
+          <div class="field"><label>Vendor</label><input id="f-vendor" placeholder="e.g. Adobe Inc."></div>
+          <div class="field"><label>Category</label>
+            <select id="f-cat">
+              <option>Software</option><option>SaaS</option><option>Domain</option>
+              <option>SSL / Security</option><option>Hardware</option><option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-grid fg-2">
+          <div class="field"><label>Expiration Date *</label><input type="date" id="f-expiry"></div>
+          <div class="field"><label>Annual Cost</label><input id="f-cost" placeholder="e.g. $299 / year"></div>
+        </div>
+        <div class="chips-group">
+          <label>Reminder Intervals (days before expiry)</label>
+          <div class="chips" id="form-chips">
+            <div class="chip" data-d="90">90 days</div>
+            <div class="chip on" data-d="60">60 days</div>
+            <div class="chip on" data-d="30">30 days</div>
+            <div class="chip" data-d="14">14 days</div>
+            <div class="chip on" data-d="7">7 days</div>
+            <div class="chip" data-d="3">3 days</div>
+            <div class="chip" data-d="1">1 day</div>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:22px;"><label>Internal Notes</label><input id="f-notes" placeholder="Seat count, account owner, renewal contact…"></div>
+        <div class="form-actions">
+          <button class="btn btn-primary" onclick="_addLicense()">Save Entry</button>
+          <button class="btn btn-ghost" onclick="_toggleForm()">Discard</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <span class="toolbar-left">All Licenses</span>
+      <span style="font-size:12px;color:var(--faint)" id="row-count"></span>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-head">
+        <div>License</div><div>Category</div><div>Expires</div>
+        <div>Cost</div><div>Status</div><div style="text-align:right">Actions</div>
+      </div>
+      <div id="license-list"></div>
+    </div>
+
+    <div class="settings-panel">
+      <div class="settings-panel-header">Notification Settings</div>
+      <div class="settings-body">
+        <div class="settings-grid">
+          <div class="settings-block">
+            <div>
+              <h4>Recipient Email</h4>
+              <p>Reminders will be sent to this address via your default email client.</p>
+            </div>
+            <div class="field"><input type="email" id="s-email" placeholder="you@company.com" oninput="_saveSettings()"></div>
+          </div>
+          <div class="settings-block">
+            <div>
+              <h4>Default Reminder Schedule</h4>
+              <p>Applied to all licenses unless overridden per entry.</p>
+            </div>
+            <div class="chips" id="global-chips">
+              <div class="chip" data-d="90">90d</div>
+              <div class="chip on" data-d="60">60d</div>
+              <div class="chip on" data-d="30">30d</div>
+              <div class="chip" data-d="14">14d</div>
+              <div class="chip on" data-d="7">7d</div>
+              <div class="chip" data-d="3">3d</div>
+              <div class="chip" data-d="1">1d</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="action-row">
+        <button class="btn btn-primary" onclick="_sendAll()">Send Reminders</button>
+        <div class="divider"></div>
+        <button class="text-link" onclick="_exportData()">Export JSON</button>
+        <button class="text-link" onclick="document.getElementById('imp').click()">Import JSON</button>
+        <input type="file" id="imp" style="display:none" accept=".json" onchange="_importData(event)">
+        <span class="action-row-note">Opens your email client with all due licenses pre-filled</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
 <div class="overlay" id="del-modal">
   <div class="modal">
     <div class="modal-header"><h3>Remove License?</h3></div>
@@ -413,10 +563,10 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, doc, getDocs, setDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBxSpcb3DMtv7UWStqrxA9xULASE7eE_kI",
@@ -429,28 +579,100 @@
   };
 
   const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  const db  = getFirestore(app);
+  const auth = getAuth(app);
+  const googleProvider = new GoogleAuthProvider();
 
   let licenses = [];
   let settings = {email:'', intervals:[60,30,7]};
   let delTarget = null;
+  let currentUser = null;
 
+  // ── helpers ──────────────────────────────────────────────
   function uid()     { return Date.now().toString(36)+Math.random().toString(36).slice(2); }
-  function offset(d) { const dt=new Date(); dt.setDate(dt.getDate()+d); return dt.toISOString().split('T')[0]; }
   function diff(exp) { const n=new Date(); n.setHours(0,0,0,0); return Math.round((new Date(exp+'T00:00:00')-n)/86400000); }
   function esc(s)    { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
+  function userCol(path) { return `users/${currentUser.uid}/${path}`; }
 
+  // ── auth ui ──────────────────────────────────────────────
+  window.switchTab = (tab) => {
+    document.getElementById('tab-login').classList.toggle('active', tab==='login');
+    document.getElementById('tab-signup').classList.toggle('active', tab==='signup');
+    document.getElementById('auth-submit-btn').textContent = tab==='login' ? 'Sign In' : 'Create Account';
+    document.getElementById('auth-error').classList.remove('show');
+  };
+
+  function showAuthError(msg) {
+    const el = document.getElementById('auth-error');
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+
+  window.submitAuth = async () => {
+    const email    = document.getElementById('auth-email').value.trim();
+    const password = document.getElementById('auth-password').value;
+    const isLogin  = document.getElementById('tab-login').classList.contains('active');
+    if (!email || !password) { showAuthError('Please enter your email and password.'); return; }
+    try {
+      if (isLogin) {
+        await signInWithEmailAndPassword(auth, email, password);
+      } else {
+        await createUserWithEmailAndPassword(auth, email, password);
+      }
+    } catch(e) {
+      const msgs = {
+        'auth/invalid-email': 'Invalid email address.',
+        'auth/user-not-found': 'No account found with this email.',
+        'auth/wrong-password': 'Incorrect password.',
+        'auth/email-already-in-use': 'An account with this email already exists.',
+        'auth/weak-password': 'Password should be at least 6 characters.',
+        'auth/invalid-credential': 'Invalid email or password.',
+      };
+      showAuthError(msgs[e.code] || e.message);
+    }
+  };
+
+  window.signInWithGoogle = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch(e) {
+      showAuthError('Google sign-in failed. Please try again.');
+    }
+  };
+
+  window._signOut = () => signOut(auth);
+
+  // ── auth state ────────────────────────────────────────────
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      currentUser = user;
+      document.getElementById('auth-screen').classList.add('hidden');
+      document.getElementById('app-screen').classList.remove('hidden');
+      document.getElementById('nav-user').textContent = user.displayName || user.email;
+      const d = new Date();
+      document.getElementById('nav-date').textContent = d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+      document.querySelectorAll('#global-chips .chip').forEach(c => {
+        c.onclick = () => { c.classList.toggle('on'); window._saveGlobalIntervals(); };
+      });
+      document.querySelectorAll('#form-chips .chip').forEach(c => { c.onclick = () => c.classList.toggle('on'); });
+      await loadData();
+    } else {
+      currentUser = null;
+      document.getElementById('auth-screen').classList.remove('hidden');
+      document.getElementById('app-screen').classList.add('hidden');
+    }
+  });
+
+  // ── data ──────────────────────────────────────────────────
   async function loadData() {
     toast('Loading…');
-    // Load licenses — filter out empty/phantom docs
-    const snap = await getDocs(collection(db, 'licenses'));
+    const snap = await getDocs(collection(db, userCol('licenses')));
     licenses = snap.docs
       .map(d => { const data = d.data(); data.id = d.id; return data; })
-      .filter(l => l.name); // only keep docs that have actual data
+      .filter(l => l.name);
 
-    // Load settings
-    const sSnap = await getDoc(doc(db, 'settings', 'global'));
+    const sSnap = await getDoc(doc(db, userCol('settings/global')));
     if (sSnap.exists()) {
       settings = sSnap.data();
       document.getElementById('s-email').value = settings.email || '';
@@ -458,32 +680,24 @@
         c.classList.toggle('on', (settings.intervals||[]).includes(+c.dataset.d));
       });
     }
-
-    // Clean up any phantom empty docs
-    for (const d of snap.docs) {
-      if (!d.data().name) await deleteDoc(doc(db, 'licenses', d.id));
-    }
     render();
   }
 
   async function saveLicense(lic) {
-    await setDoc(doc(db, 'licenses', lic.id), lic);
-  }
-
-  async function deleteLicense(id) {
-    await deleteDoc(doc(db, 'licenses', id));
+    await setDoc(doc(db, userCol(`licenses/${lic.id}`)), lic);
   }
 
   async function saveSettings() {
     settings.email = document.getElementById('s-email').value;
-    await setDoc(doc(db, 'settings', 'global'), settings);
+    await setDoc(doc(db, userCol('settings/global')), settings);
   }
 
   async function saveGlobalIntervals() {
     settings.intervals = [...document.querySelectorAll('#global-chips .chip.on')].map(c=>+c.dataset.d);
-    await setDoc(doc(db, 'settings', 'global'), settings);
+    await setDoc(doc(db, userCol('settings/global')), settings);
   }
 
+  // ── render ────────────────────────────────────────────────
   function statusOf(days) {
     if (days < 0)   return {row:'row-expired',  tag:'tag-expired',  label:'Expired',  dc:'c-danger', dtext:`${Math.abs(days)}d overdue`};
     if (days <= 7)  return {row:'row-critical', tag:'tag-critical', label:'Critical', dc:'c-danger', dtext:`${days}d left`};
@@ -526,7 +740,7 @@
     document.getElementById('k-ok').textContent      = licenses.filter(l=>diff(l.expiry)>30).length;
   }
 
-  // Expose functions to global scope for inline onclick handlers
+  // ── global actions ────────────────────────────────────────
   window._toggleForm = () => document.getElementById('add-form').classList.toggle('open');
 
   window._addLicense = async () => {
@@ -557,12 +771,11 @@
   window._confirmDelete = async () => {
     try {
       toast('Deleting…');
-      await deleteDoc(doc(db, 'licenses', delTarget));
+      await deleteDoc(doc(db, userCol(`licenses/${delTarget}`)));
       licenses = licenses.filter(l=>l.id!==delTarget);
       render(); window._closeModal(); toast('Entry removed.');
     } catch(e) {
-      toast('Delete error: ' + e.message);
-      console.error('Delete failed:', e);
+      toast('Error: ' + e.message);
     }
   };
 
@@ -574,6 +787,7 @@
       .filter(({l,days})=>days<0||(l.reminders||settings.intervals).some(r=>days<=r))
       .sort((a,b)=>a.days-b.days);
   }
+
   function buildBody(items) {
     let b=`LICENSE RENEWAL REMINDERS\n${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}\n${'─'.repeat(40)}\n\n`;
     items.forEach(({l,days})=>{
@@ -583,13 +797,13 @@
       if(l.notes) b+=`  Notes: ${l.notes}\n`;
       b+='\n';
     });
-    b+='─'.repeat(40)+'\nGenerated by Renewly';
+    b+='─'.repeat(40)+'\nGenerated by re-newly';
     return b;
   }
 
   window._sendAll = () => {
     const email=settings.email;
-    if (!email) { toast('Please enter your email address in Notification Settings.'); document.getElementById('s-email').focus(); return; }
+    if (!email) { toast('Please enter your email in Notification Settings.'); return; }
     const due=dueLicenses();
     if (!due.length) { toast('No reminders are due at this time.'); return; }
     window.open(`mailto:${email}?subject=${encodeURIComponent('License Reminders — '+due.length+' require attention')}&body=${encodeURIComponent(buildBody(due))}`);
@@ -597,7 +811,7 @@
 
   window._emailOne = (id) => {
     const lic=licenses.find(l=>l.id===id); if(!lic) return;
-    if (!settings.email) { toast('Please enter your email address in Notification Settings.'); return; }
+    if (!settings.email) { toast('Please enter your email in Notification Settings.'); return; }
     const days=diff(lic.expiry);
     window.open(`mailto:${settings.email}?subject=${encodeURIComponent('License Reminder: '+lic.name)}&body=${encodeURIComponent(buildBody([{l:lic,days}]))}`);
   };
@@ -605,7 +819,7 @@
   window._exportData = () => {
     const a=document.createElement('a');
     a.href=URL.createObjectURL(new Blob([JSON.stringify({licenses,settings},null,2)],{type:'application/json'}));
-    a.download=`renewly-${new Date().toISOString().split('T')[0]}.json`;
+    a.download=`re-newly-${new Date().toISOString().split('T')[0]}.json`;
     a.click(); toast('Data exported.');
   };
 
@@ -615,34 +829,19 @@
     r.onload=async ev=>{
       try {
         const d=JSON.parse(ev.target.result);
-        if(d.licenses) {
-          for (const lic of d.licenses) await saveLicense(lic);
-          licenses = d.licenses;
-        }
-        if(d.settings) {
-          settings=d.settings;
-          document.getElementById('s-email').value=settings.email||'';
-          await saveSettings();
-        }
+        if(d.licenses) { for (const lic of d.licenses) await saveLicense(lic); licenses=d.licenses; }
+        if(d.settings) { settings=d.settings; document.getElementById('s-email').value=settings.email||''; await saveSettings(); }
         render(); toast('Data imported successfully.');
       } catch { toast('Unable to parse the selected file.'); }
     };
     r.readAsText(file); e.target.value='';
   };
 
-  // Init
-  window.addEventListener('DOMContentLoaded', () => {
-    const d = new Date();
-    document.getElementById('nav-date').textContent =
-      d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-
-    document.querySelectorAll('#global-chips .chip').forEach(c => {
-      c.classList.toggle('on', settings.intervals.includes(+c.dataset.d));
-      c.onclick = () => { c.classList.toggle('on'); window._saveGlobalIntervals(); };
-    });
-    document.querySelectorAll('#form-chips .chip').forEach(c => { c.onclick = () => c.classList.toggle('on'); });
-
-    loadData();
+  // enter key on auth form
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !document.getElementById('auth-screen').classList.contains('hidden')) {
+      window.submitAuth();
+    }
   });
 </script>
 </body>
