@@ -34,6 +34,28 @@
     line-height: 1.5;
   }
 
+  /* LOADING SCREEN */
+  .loading-screen {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 999;
+    transition: opacity 0.3s ease;
+  }
+  .loading-screen.fade-out { opacity: 0; pointer-events: none; }
+  .loading-spinner {
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+  }
+  .spinner-ring {
+    width: 36px; height: 36px;
+    border: 2.5px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner-text { font-size: 12px; color: var(--faint); letter-spacing: 2px; text-transform: uppercase; font-weight: 500; }
+
   /* AUTH SCREEN */
   .auth-screen {
     min-height: 100vh;
@@ -335,6 +357,17 @@
   /* HIDDEN */
   .hidden { display: none !important; }
 
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 24px 48px 40px;
+    font-size: 11px;
+    color: var(--faint);
+    font-weight: 300;
+    letter-spacing: 0.5px;
+  }
+  .footer span { color: var(--border2); margin: 0 6px; }
+
   @media (max-width: 720px) {
     .topnav { padding: 0 20px; }
     .page { padding: 24px 20px 60px; }
@@ -349,8 +382,16 @@
 </head>
 <body>
 
+<!-- LOADING SCREEN -->
+<div id="loading-screen" class="loading-screen">
+  <div class="loading-spinner">
+    <div class="spinner-ring"></div>
+    <span class="spinner-text">Loading</span>
+  </div>
+</div>
+
 <!-- AUTH SCREEN -->
-<div class="auth-screen" id="auth-screen">
+<div class="auth-screen hidden" id="auth-screen">
   <div class="auth-card">
     <div class="auth-header">
       <div class="auth-logo">
@@ -547,6 +588,10 @@
       </div>
     </div>
   </div>
+  <footer class="footer">
+    © 2026 Karam Al-Ramahi <span>·</span> re-newly
+  </footer>
+
 </div>
 
 <!-- DELETE MODAL -->
@@ -644,11 +689,18 @@
   window._signOut = () => signOut(auth);
 
   // ── auth state ────────────────────────────────────────────
+  function hideLoader() {
+    const loader = document.getElementById('loading-screen');
+    loader.classList.add('fade-out');
+    setTimeout(() => loader.style.display = 'none', 300);
+  }
+
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       currentUser = user;
       document.getElementById('auth-screen').classList.add('hidden');
       document.getElementById('app-screen').classList.remove('hidden');
+      hideLoader();
       document.getElementById('nav-user').textContent = user.displayName || user.email;
       const d = new Date();
       document.getElementById('nav-date').textContent = d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
@@ -661,6 +713,7 @@
       currentUser = null;
       document.getElementById('auth-screen').classList.remove('hidden');
       document.getElementById('app-screen').classList.add('hidden');
+      hideLoader();
     }
   });
 
