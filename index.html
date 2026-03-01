@@ -492,6 +492,7 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
           <div class="field" style="margin-bottom:22px"><label>Internal Notes</label><input id="f-notes" placeholder="Seat count, account owner, renewal contact…"></div>
           <div class="form-actions">
             <button class="btn btn-primary" onclick="_addLicense()">Save Entry</button>
+            <button class="btn btn-ghost" onclick="_saveAsTemplate()" title="Save current form as a reusable template">⭐ Save as Template</button>
             <button class="btn btn-ghost" onclick="_toggleForm()">Discard</button>
           </div>
         </div>
@@ -1037,6 +1038,7 @@ window.openVault = async (vaultId, role) => {
 
   // Load members if owner
   if (role === 'owner') await loadMembers();
+  await loadUserTemplates();
 
   // Render
   document.getElementById('search-input').value = '';
@@ -1511,41 +1513,72 @@ window._sendPasswordReset = async () => {
 };
 
 
-// ── License Templates ─────────────────────────────────────────────────────
-const LICENSE_TEMPLATES = [
-  { name:'GitHub Teams',      vendor:'GitHub',      category:'SaaS',     cost:'$44/mo' },
-  { name:'AWS',               vendor:'Amazon',      category:'SaaS',     cost:'' },
-  { name:'Adobe Creative Cloud', vendor:'Adobe',   category:'Software',  cost:'$54.99/mo' },
-  { name:'Google Workspace',  vendor:'Google',      category:'SaaS',     cost:'$12/user/mo' },
-  { name:'Slack',             vendor:'Slack',       category:'SaaS',     cost:'' },
-  { name:'Cloudflare',        vendor:'Cloudflare',  category:'SaaS',     cost:'' },
-  { name:'Figma',             vendor:'Figma',       category:'SaaS',     cost:'$15/mo' },
-  { name:'Notion',            vendor:'Notion',      category:'SaaS',     cost:'$10/mo' },
-  { name:'Jira',              vendor:'Atlassian',   category:'SaaS',     cost:'' },
-  { name:'1Password',         vendor:'1Password',   category:'SaaS',     cost:'$7.99/mo' },
-  { name:'Zoom',              vendor:'Zoom',        category:'SaaS',     cost:'$15.99/mo' },
-  { name:'Linear',            vendor:'Linear',      category:'SaaS',     cost:'' },
-];
+// ── License Templates (user-defined) ─────────────────────────────────────
+let userTemplates = [];
+
+async function loadUserTemplates() {
+  try {
+    const snap = await getDocs(collection(db, `users/${currentUser.uid}/templates`));
+    userTemplates = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch(e) { userTemplates = []; }
+}
 
 function _renderTemplates() {
   const grid = document.getElementById('templates-grid');
   if (!grid) return;
-  grid.innerHTML = LICENSE_TEMPLATES.map((t,i) => `
-    <div class="template-card" onclick="_applyTemplate(${i})">
-      <div class="template-name">${t.name}</div>
-      <div class="template-vendor">${t.vendor} · ${t.category}</div>
+  if (!userTemplates.length) {
+    grid.innerHTML = `<div style="font-size:12px;color:var(--faint);font-style:italic;padding:8px 0;">No templates yet. Save a license as a template to reuse it.</div>`;
+    return;
+  }
+  grid.innerHTML = userTemplates.map((t) => `
+    <div class="template-card" style="position:relative">
+      <div onclick="_applyTemplate('${t.id}')" style="cursor:pointer">
+        <div class="template-name">${esc(t.name)}</div>
+        <div class="template-vendor">${esc(t.vendor||'')}${t.vendor&&t.category?' · ':''}${esc(t.category||'')}</div>
+      </div>
+      <button onclick="_deleteTemplate('${t.id}')" title="Delete template" style="position:absolute;top:6px;right:6px;width:18px;height:18px;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--faint);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
     </div>`).join('');
 }
 
-window._applyTemplate = (i) => {
-  const t = LICENSE_TEMPLATES[i];
+window._applyTemplate = (id) => {
+  const t = userTemplates.find(t => t.id === id);
+  if (!t) return;
   document.getElementById('f-name').value   = t.name;
-  document.getElementById('f-vendor').value = t.vendor;
-  document.getElementById('f-cost').value   = t.cost;
+  document.getElementById('f-vendor').value = t.vendor || '';
+  document.getElementById('f-cost').value   = t.cost || '';
+  document.getElementById('f-notes').value  = t.notes || '';
+  document.getElementById('f-seats').value  = t.seats || '';
   const catSel = document.getElementById('f-cat');
   [...catSel.options].forEach((o,j) => { if(o.value===t.category) catSel.selectedIndex=j; });
   document.getElementById('f-expiry').focus();
   _checkDuplicate();
+};
+
+window._saveAsTemplate = async () => {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { toast('Fill in a license name first.'); return; }
+  const seatsVal = document.getElementById('f-seats').value.trim();
+  const tmpl = {
+    name,
+    vendor:   document.getElementById('f-vendor').value.trim(),
+    category: document.getElementById('f-cat').value,
+    cost:     document.getElementById('f-cost').value.trim(),
+    notes:    document.getElementById('f-notes').value.trim(),
+    seats:    seatsVal ? parseInt(seatsVal) : null,
+    createdAt: new Date().toISOString()
+  };
+  const id = uid();
+  await setDoc(doc(db, `users/${currentUser.uid}/templates/${id}`), tmpl);
+  userTemplates.push({ id, ...tmpl });
+  _renderTemplates();
+  toast(`Template "${name}" saved.`);
+};
+
+window._deleteTemplate = async (id) => {
+  await deleteDoc(doc(db, `users/${currentUser.uid}/templates/${id}`));
+  userTemplates = userTemplates.filter(t => t.id !== id);
+  _renderTemplates();
+  toast('Template deleted.');
 };
 
 // ── Duplicate Detection ───────────────────────────────────────────────────
@@ -1565,10 +1598,9 @@ window._toggleDark = () => {
   localStorage.setItem('rn-theme', isDark ? 'light' : 'dark');
 };
 
-// Apply saved theme on load
+// Apply saved theme on load — light is default, dark only if explicitly chosen
 (function() {
-  const saved = localStorage.getItem('rn-theme') ||
-    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const saved = localStorage.getItem('rn-theme');
   if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
 })();
 
