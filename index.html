@@ -14,8 +14,15 @@
   --accent:#6b5335; --accent-h:#5a4429;
   --danger:#9e3d3a; --warn:#9e6a2a; --ok:#2e6b50;
 }
+[data-theme="dark"] {
+  --bg:#161310; --surface:#1e1a14; --surface2:#252018;
+  --border:#2e2820; --border2:#3d3528;
+  --text:#f0e8d8; --muted:#9a8f80; --faint:#5a5248;
+  --accent:#a07850; --accent-h:#b88a60;
+  --danger:#c0524e; --warn:#c08040; --ok:#3d8f6a;
+}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;}
+body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;transition:background .3s,color .3s;}
 
 /* LOADING */
 .loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;transition:opacity .3s ease;}
@@ -175,10 +182,11 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
 
 /* TABLE */
 .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:24px;}
-.table-head{display:grid;grid-template-columns:2fr .8fr 1fr .7fr .7fr 1.1fr 120px;padding:12px 20px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);}
-.table-row{display:grid;grid-template-columns:2fr .8fr 1fr .7fr .7fr 1.1fr 120px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;transition:background .15s;animation:rowIn .25s ease both;}
+.table-head{display:grid;grid-template-columns:32px 2fr .8fr 1fr .7fr .7fr 1.1fr 120px;padding:12px 20px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);}
+.table-row{display:grid;grid-template-columns:32px 2fr .8fr 1fr .7fr .7fr 1.1fr 120px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;transition:background .15s;animation:rowIn .25s ease both;}
 .table-row:last-child{border-bottom:none;}
 .table-row:hover{background:rgba(107,83,53,.025);}
+.table-row.row-selected{background:rgba(107,83,53,.06)!important;}
 .row-expired{background:rgba(158,61,58,.03)!important;}
 .row-critical{background:rgba(158,61,58,.02)!important;}
 .row-warning{background:rgba(158,106,42,.02)!important;}
@@ -269,8 +277,44 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
 /* HIDDEN */
 .hidden{display:none!important;}
 
-/* BACK BUTTON */
+/* DARK MODE TOGGLE */
+.dark-toggle{width:36px;height:20px;border-radius:10px;background:var(--border);border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
+.dark-toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--surface);transition:transform .2s,background .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+[data-theme="dark"] .dark-toggle{background:var(--accent);}
+[data-theme="dark"] .dark-toggle::after{transform:translateX(16px);}
 
+/* BULK ACTIONS */
+.bulk-bar{display:none;align-items:center;gap:12px;padding:10px 20px;background:var(--accent);color:#faf6ef;border-radius:8px;margin-bottom:8px;animation:rowIn .2s ease;}
+.bulk-bar.show{display:flex;}
+.bulk-bar-count{font-size:13px;font-weight:600;flex:1;}
+.bulk-btn{padding:6px 14px;border-radius:5px;border:1px solid rgba(255,255,255,.3);background:transparent;color:#faf6ef;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s;}
+.bulk-btn:hover{background:rgba(255,255,255,.15);}
+.bulk-btn.bulk-danger{border-color:rgba(255,150,140,.4);color:#ffb8b4;}
+.bulk-btn.bulk-danger:hover{background:rgba(200,60,50,.25);}
+.row-checkbox{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;}
+.table-head-check{display:flex;align-items:center;}
+
+/* TEMPLATES */
+.templates-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:4px;}
+.template-card{padding:12px 14px;border:1px solid var(--border);border-radius:7px;cursor:pointer;transition:all .15s;background:var(--bg);}
+.template-card:hover{border-color:var(--accent);background:rgba(107,83,53,.04);}
+.template-name{font-size:13px;font-weight:600;color:var(--text);}
+.template-vendor{font-size:11px;color:var(--muted);margin-top:2px;}
+
+/* DUPLICATE WARNING */
+.dup-warning{display:none;background:rgba(158,106,42,.08);border:1px solid rgba(158,106,42,.3);border-radius:6px;padding:9px 14px;font-size:12px;color:var(--warn);margin-bottom:12px;}
+.dup-warning.show{display:block;}
+
+/* ARCHIVE badge */
+.badge-archived{background:rgba(184,173,158,.15);color:var(--faint);}
+.vault-card.archived-card{opacity:.65;}
+.vault-card.archived-card::before{background:var(--faint);}
+
+/* VAULT ACTIONS ROW on dashboard cards */
+.vault-card-actions{display:flex;gap:6px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.vault-action-btn{flex:1;padding:5px 8px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;text-align:center;}
+.vault-action-btn:hover{border-color:var(--border2);color:var(--text);}
+.vault-action-btn.danger:hover{border-color:var(--danger);color:var(--danger);}
 
 /* VAULT NAME INPUT IN MODAL */
 .vault-color-grid{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
@@ -281,9 +325,9 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
   .topnav{padding:0 16px;}
   .page,.dash-page{padding:20px 16px 60px;}
   .kpi-row{grid-template-columns:1fr 1fr;}
-  .table-head>*:nth-child(2),.table-head>*:nth-child(3),.table-head>*:nth-child(4),
-  .table-row>*:nth-child(2),.table-row>*:nth-child(3),.table-row>*:nth-child(4){display:none;}
-  .table-head,.table-row{grid-template-columns:1fr auto auto;}
+  .table-head>*:nth-child(3),.table-head>*:nth-child(4),.table-head>*:nth-child(5),
+  .table-row>*:nth-child(3),.table-row>*:nth-child(4),.table-row>*:nth-child(5){display:none;}
+  .table-head,.table-row{grid-template-columns:32px 1fr auto auto;}
   .fg-3,.fg-2{grid-template-columns:1fr;}
   .vault-grid{grid-template-columns:1fr;}
 }
@@ -370,6 +414,10 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
           <div style="padding:4px 0">
             <button class="user-dropdown-item" onclick="_openAccountModal()"><span class="user-dropdown-icon">👤</span> Account Details</button>
             <button class="user-dropdown-item" onclick="_openResetPasswordModal()"><span class="user-dropdown-icon">🔑</span> Reset Password</button>
+            <button class="user-dropdown-item" onclick="_toggleDark()" style="justify-content:space-between">
+              <span style="display:flex;align-items:center;gap:10px"><span class="user-dropdown-icon">🌙</span> Dark Mode</span>
+              <button class="dark-toggle" id="dark-toggle" onclick="event.stopPropagation();_toggleDark()"></button>
+            </button>
             <div class="user-dropdown-divider"></div>
             <button class="user-dropdown-item danger" onclick="_signOut()"><span class="user-dropdown-icon">↩</span> Sign Out</button>
           </div>
@@ -417,8 +465,16 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
       <div class="form-panel" id="add-form">
         <div class="form-panel-header">New License Entry</div>
         <div class="form-body">
+          <!-- TEMPLATES -->
+          <div style="margin-bottom:16px">
+            <div style="font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Quick Templates</div>
+            <div class="templates-grid" id="templates-grid"></div>
+          </div>
+
+          <div class="dup-warning" id="dup-warning">⚠ A license with a similar name already exists — check below before adding.</div>
+
           <div class="form-grid fg-3">
-            <div class="field"><label>License Name *</label><input id="f-name" placeholder="e.g. Adobe Creative Cloud"></div>
+            <div class="field"><label>License Name *</label><input id="f-name" placeholder="e.g. Adobe Creative Cloud" oninput="_checkDuplicate()"></div>
             <div class="field"><label>Vendor</label><input id="f-vendor" placeholder="e.g. Adobe Inc."></div>
             <div class="field"><label>Category</label><select id="f-cat"><option>Software</option><option>SaaS</option><option>Domain</option><option>SSL / Security</option><option>Hardware</option><option>Other</option></select></div>
           </div>
@@ -441,6 +497,13 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
         </div>
       </div>
 
+      <div class="bulk-bar" id="bulk-bar">
+        <span class="bulk-bar-count" id="bulk-count">0 selected</span>
+        <button class="bulk-btn" onclick="_bulkExportCSV()">⬇ Export CSV</button>
+        <button class="bulk-btn bulk-danger" onclick="_bulkDelete()">✕ Delete Selected</button>
+        <button class="bulk-btn" onclick="_clearBulk()">✕ Cancel</button>
+      </div>
+
       <div class="toolbar">
         <span class="toolbar-left">Licenses</span>
         <div class="toolbar-right">
@@ -455,11 +518,13 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
             <button class="filter-btn" data-filter="active" onclick="_setFilter('active',this)">Active</button>
           </div>
           <span class="row-count-badge" id="row-count"></span>
+          <button class="btn btn-ghost btn-sm" onclick="_exportCSV()" title="Export vault to CSV" style="white-space:nowrap">⬇ CSV</button>
         </div>
       </div>
 
       <div class="table-wrap">
-        <div class="table-head">
+        <div class="table-head" id="table-head">
+          <div class="table-head-check"><input type="checkbox" class="row-checkbox" id="select-all" onclick="_toggleSelectAll()" title="Select all"></div>
           <div>License</div><div>Category</div><div>Expires</div>
           <div>Cost</div><div>Seats</div><div>Status</div><div style="text-align:right">Actions</div>
         </div>
@@ -636,6 +701,21 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
   </div>
 </div>
 
+<!-- RENAME VAULT MODAL -->
+<div class="overlay" id="rename-vault-modal">
+  <div class="modal">
+    <div class="modal-header"><h3>Rename Vault</h3></div>
+    <div class="modal-body">
+      <div class="field" style="margin-bottom:12px"><label>Vault Name *</label><input id="rv-name" placeholder="e.g. Work Licenses"></div>
+      <div class="field" style="margin-bottom:4px"><label>Description</label><input id="rv-desc" placeholder="Optional description"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="_confirmRenameVault()">Save</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('rename-vault-modal').classList.remove('open')">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- ACCOUNT MODAL -->
 <div class="overlay" id="account-modal">
   <div class="modal">
@@ -716,6 +796,8 @@ let selectedRole = 'viewer';
 let activeFilter = 'all';
 let searchQuery  = '';
 let delVaultTarget = null;
+let selectedIds = new Set();
+let renameVaultTarget = null;
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 function uid()     { return Date.now().toString(36)+Math.random().toString(36).slice(2); }
@@ -863,15 +945,21 @@ function renderDashboard() {
   myVaults.forEach(v => {
     const expired = v.licenses.filter(l => diff(l.expiry) < 0).length;
     const expiring = v.licenses.filter(l => { const d=diff(l.expiry); return d>=0&&d<=30; }).length;
-    html += `<div class="vault-card" onclick="openVault('${v.id}','owner')">
-      <span class="vault-role-badge badge-owner">Owner</span>
-      <div class="vault-card-icon">🗄️</div>
+    const isArchived = v.archived;
+    html += `<div class="vault-card${isArchived?' archived-card':''}" onclick="openVault('${v.id}','owner')">
+      <span class="vault-role-badge ${isArchived?'badge-archived':'badge-owner'}">${isArchived?'Archived':'Owner'}</span>
+      <div class="vault-card-icon">${isArchived?'📦':'🗄️'}</div>
       <div class="vault-card-name">${esc(v.name)}</div>
       <div class="vault-card-meta">${esc(v.desc||'Personal vault')}</div>
       <div class="vault-card-stats">
         <div class="vault-stat"><strong>${v.licenses.length}</strong>licenses</div>
         ${expired ? `<div class="vault-stat stat-danger"><strong>${expired}</strong>expired</div>` : ''}
         ${expiring ? `<div class="vault-stat stat-warn"><strong>${expiring}</strong>expiring</div>` : ''}
+      </div>
+      <div class="vault-card-actions" onclick="event.stopPropagation()">
+        <button class="vault-action-btn" onclick="_openRenameVault('${v.id}')">✎ Rename</button>
+        <button class="vault-action-btn" onclick="_toggleArchiveVault('${v.id}',${!isArchived})">${isArchived?'↩ Unarchive':'📦 Archive'}</button>
+        <button class="vault-action-btn danger" onclick="_promptDeleteVault('${v.id}')">✕ Delete</button>
       </div>
     </div>`;
   });
@@ -910,7 +998,7 @@ window.openVault = async (vaultId, role) => {
   if (!vault) return;
   currentVault = vault;
   licenses = [...vault.licenses];
-  activeFilter = 'all'; searchQuery = '';
+  activeFilter = 'all'; searchQuery = ''; selectedIds.clear();
 
   showScreen('vault', vaultId);
   document.getElementById('nav-vault-label').style.display = 'flex';
@@ -1006,7 +1094,7 @@ window._confirmCreateVault = async () => {
     // Directly set currentVault and enter — no array lookup needed
     currentVault = newVault;
     licenses = [];
-    activeFilter = 'all'; searchQuery = '';
+    activeFilter = 'all'; searchQuery = ''; selectedIds.clear();
     settings = { email:'', intervals:[60,30,7] };
 
     showScreen('vault', vaultId);
@@ -1102,7 +1190,9 @@ function render() {
     list.innerHTML = sorted.map((lic,i) => {
       const days=diff(lic.expiry), s=statusOf(days);
       const seats = lic.seats ? `<span style="font-weight:500">${esc(String(lic.seats))}</span>` : '—';
-      return `<div class="table-row ${s.row}" style="animation-delay:${i*35}ms">
+      const isChecked = selectedIds.has(lic.id);
+      return `<div class="table-row ${s.row}${isChecked?' row-selected':''}" style="animation-delay:${i*35}ms">
+        <div><input type="checkbox" class="row-checkbox" ${isChecked?'checked':''} onchange="_toggleSelect('${lic.id}',this.checked)" onclick="event.stopPropagation()"></div>
         <div><div class="row-name">${esc(lic.name)}</div><div class="row-vendor">${esc(lic.vendor||'—')}${lic.notes?` · <span style="color:var(--faint)">${esc(lic.notes)}</span>`:''}</div></div>
         <div class="row-cell">${esc(lic.category||'—')}</div>
         <div class="row-cell">${lic.expiry}</div>
@@ -1126,7 +1216,7 @@ function render() {
 }
 
 // ── CRUD ──────────────────────────────────────────────────────────────────
-window._toggleForm = () => { if(canEditVault()) document.getElementById('add-form').classList.toggle('open'); };
+window._toggleForm = () => { if(canEditVault()) { document.getElementById('add-form').classList.toggle('open'); if(document.getElementById('add-form').classList.contains('open')) { _renderTemplates(); document.getElementById('dup-warning').classList.remove('show'); } } };
 
 window._addLicense = async () => {
   const name=document.getElementById('f-name').value.trim(), expiry=document.getElementById('f-expiry').value;
@@ -1418,6 +1508,177 @@ window._sendPasswordReset = async () => {
     btn.disabled = false; btn.textContent = 'Send Reset Email';
     toast('Error: ' + e.message);
   }
+};
+
+
+// ── License Templates ─────────────────────────────────────────────────────
+const LICENSE_TEMPLATES = [
+  { name:'GitHub Teams',      vendor:'GitHub',      category:'SaaS',     cost:'$44/mo' },
+  { name:'AWS',               vendor:'Amazon',      category:'SaaS',     cost:'' },
+  { name:'Adobe Creative Cloud', vendor:'Adobe',   category:'Software',  cost:'$54.99/mo' },
+  { name:'Google Workspace',  vendor:'Google',      category:'SaaS',     cost:'$12/user/mo' },
+  { name:'Slack',             vendor:'Slack',       category:'SaaS',     cost:'' },
+  { name:'Cloudflare',        vendor:'Cloudflare',  category:'SaaS',     cost:'' },
+  { name:'Figma',             vendor:'Figma',       category:'SaaS',     cost:'$15/mo' },
+  { name:'Notion',            vendor:'Notion',      category:'SaaS',     cost:'$10/mo' },
+  { name:'Jira',              vendor:'Atlassian',   category:'SaaS',     cost:'' },
+  { name:'1Password',         vendor:'1Password',   category:'SaaS',     cost:'$7.99/mo' },
+  { name:'Zoom',              vendor:'Zoom',        category:'SaaS',     cost:'$15.99/mo' },
+  { name:'Linear',            vendor:'Linear',      category:'SaaS',     cost:'' },
+];
+
+function _renderTemplates() {
+  const grid = document.getElementById('templates-grid');
+  if (!grid) return;
+  grid.innerHTML = LICENSE_TEMPLATES.map((t,i) => `
+    <div class="template-card" onclick="_applyTemplate(${i})">
+      <div class="template-name">${t.name}</div>
+      <div class="template-vendor">${t.vendor} · ${t.category}</div>
+    </div>`).join('');
+}
+
+window._applyTemplate = (i) => {
+  const t = LICENSE_TEMPLATES[i];
+  document.getElementById('f-name').value   = t.name;
+  document.getElementById('f-vendor').value = t.vendor;
+  document.getElementById('f-cost').value   = t.cost;
+  const catSel = document.getElementById('f-cat');
+  [...catSel.options].forEach((o,j) => { if(o.value===t.category) catSel.selectedIndex=j; });
+  document.getElementById('f-expiry').focus();
+  _checkDuplicate();
+};
+
+// ── Duplicate Detection ───────────────────────────────────────────────────
+window._checkDuplicate = () => {
+  const name = document.getElementById('f-name').value.trim().toLowerCase();
+  const warn = document.getElementById('dup-warning');
+  if (!name || name.length < 3) { warn.classList.remove('show'); return; }
+  const dup = licenses.find(l => l.name.toLowerCase().includes(name) || name.includes(l.name.toLowerCase()));
+  warn.classList.toggle('show', !!dup);
+  if (dup) warn.textContent = `⚠ "${dup.name}" already exists in this vault — is this a duplicate?`;
+};
+
+// ── Dark Mode ─────────────────────────────────────────────────────────────
+window._toggleDark = () => {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  localStorage.setItem('rn-theme', isDark ? 'light' : 'dark');
+};
+
+// Apply saved theme on load
+(function() {
+  const saved = localStorage.getItem('rn-theme') ||
+    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+
+// ── CSV Export ────────────────────────────────────────────────────────────
+window._exportCSV = () => {
+  const rows = [['Name','Vendor','Category','Expiry','Cost','Seats','Status','Notes']];
+  licenses.forEach(l => {
+    const d = diff(l.expiry);
+    const status = d < 0 ? 'Expired' : d <= 7 ? 'Critical' : d <= 30 ? 'Expiring' : 'Active';
+    rows.push([l.name, l.vendor||'', l.category||'', l.expiry, l.cost||'', l.seats||'', status, l.notes||'']);
+  });
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${currentVault.name.replace(/[^a-z0-9]/gi,'_')}_licenses.csv`;
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('CSV exported.');
+};
+
+// ── Bulk Actions ──────────────────────────────────────────────────────────
+window._toggleSelect = (id, checked) => {
+  if (checked) selectedIds.add(id); else selectedIds.delete(id);
+  _updateBulkBar();
+};
+
+window._toggleSelectAll = () => {
+  const all = document.getElementById('select-all');
+  const sorted = getFiltered();
+  if (all.checked) { sorted.forEach(l => selectedIds.add(l.id)); }
+  else { sorted.forEach(l => selectedIds.delete(l.id)); }
+  _updateBulkBar(); render();
+};
+
+function _updateBulkBar() {
+  const bar = document.getElementById('bulk-bar');
+  const count = document.getElementById('bulk-count');
+  bar.classList.toggle('show', selectedIds.size > 0);
+  count.textContent = `${selectedIds.size} license${selectedIds.size===1?'':'s'} selected`;
+  // sync select-all checkbox
+  const all = document.getElementById('select-all');
+  const sorted = getFiltered();
+  if (all) all.checked = sorted.length > 0 && sorted.every(l => selectedIds.has(l.id));
+}
+
+window._clearBulk = () => { selectedIds.clear(); _updateBulkBar(); render(); };
+
+window._bulkDelete = async () => {
+  if (!selectedIds.size) return;
+  if (!confirm(`Delete ${selectedIds.size} license${selectedIds.size===1?'':'s'}? This cannot be undone.`)) return;
+  toast('Deleting…');
+  const batch = writeBatch(db);
+  selectedIds.forEach(id => batch.delete(doc(db, `vaults/${currentVault.id}/licenses/${id}`)));
+  await batch.commit();
+  licenses = licenses.filter(l => !selectedIds.has(l.id));
+  selectedIds.clear(); _updateBulkBar(); render();
+  toast('Deleted.');
+};
+
+window._bulkExportCSV = () => {
+  const selected = licenses.filter(l => selectedIds.has(l.id));
+  const rows = [['Name','Vendor','Category','Expiry','Cost','Seats','Status','Notes']];
+  selected.forEach(l => {
+    const d = diff(l.expiry);
+    const status = d < 0 ? 'Expired' : d <= 7 ? 'Critical' : d <= 30 ? 'Expiring' : 'Active';
+    rows.push([l.name, l.vendor||'', l.category||'', l.expiry, l.cost||'', l.seats||'', status, l.notes||'']);
+  });
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${currentVault.name.replace(/[^a-z0-9]/gi,'_')}_selected.csv`;
+  a.click(); URL.revokeObjectURL(a.href);
+  toast(`Exported ${selected.length} licenses.`);
+};
+
+// ── Vault Rename ──────────────────────────────────────────────────────────
+window._openRenameVault = (vaultId) => {
+  renameVaultTarget = vaultId;
+  const vault = myVaults.find(v => v.id === vaultId);
+  if (!vault) return;
+  document.getElementById('rv-name').value = vault.name;
+  document.getElementById('rv-desc').value = vault.desc || '';
+  document.getElementById('rename-vault-modal').classList.add('open');
+};
+
+window._confirmRenameVault = async () => {
+  const name = document.getElementById('rv-name').value.trim();
+  if (!name) { toast('Please enter a vault name.'); return; }
+  const desc = document.getElementById('rv-desc').value.trim();
+  try {
+    await setDoc(doc(db, `vaults/${renameVaultTarget}`), { name, desc }, { merge: true });
+    await setDoc(doc(db, `users/${currentUser.uid}/vaults/${renameVaultTarget}`), { name }, { merge: true });
+    const v = myVaults.find(v => v.id === renameVaultTarget);
+    if (v) { v.name = name; v.desc = desc; }
+    document.getElementById('rename-vault-modal').classList.remove('open');
+    renderDashboard();
+    toast('Vault renamed.');
+  } catch(e) { toast('Error: ' + e.message); }
+};
+
+// ── Vault Archive (soft delete) ───────────────────────────────────────────
+window._toggleArchiveVault = async (vaultId, archive) => {
+  try {
+    await setDoc(doc(db, `vaults/${vaultId}`), { archived: archive }, { merge: true });
+    const v = myVaults.find(v => v.id === vaultId);
+    if (v) v.archived = archive;
+    renderDashboard();
+    toast(archive ? 'Vault archived.' : 'Vault unarchived.');
+  } catch(e) { toast('Error: ' + e.message); }
 };
 
 // ── Auth enter key ────────────────────────────────────────────────────────
