@@ -900,22 +900,53 @@ window._closeCreateVaultModal = () => document.getElementById('create-vault-moda
 window._confirmCreateVault = async () => {
   const name = document.getElementById('cv-name').value.trim();
   if (!name) { toast('Please enter a vault name.'); return; }
-  const vaultId = uid();
-  const vaultData = {
-    id: vaultId, name,
-    desc: document.getElementById('cv-desc').value.trim(),
-    ownerId: currentUser.uid,
-    createdAt: new Date().toISOString()
-  };
-  toast('Creating vault…');
-  await setDoc(doc(db, `vaults/${vaultId}`), vaultData);
-  await setDoc(doc(db, `users/${currentUser.uid}/vaults/${vaultId}`), { name, createdAt: vaultData.createdAt });
-  const newVault = { ...vaultData, role:'owner', licenses:[] };
-  myVaults.push(newVault);
-  window._closeCreateVaultModal();
-  toast('Vault created!');
-  // Open it immediately
-  openVault(vaultId, 'owner');
+
+  const btn = document.querySelector('#create-vault-modal .btn-primary');
+  btn.disabled = true; btn.textContent = 'Creating…';
+
+  try {
+    const vaultId = uid();
+    const vaultData = {
+      id: vaultId, name,
+      desc: document.getElementById('cv-desc').value.trim(),
+      ownerId: currentUser.uid,
+      createdAt: new Date().toISOString()
+    };
+    await setDoc(doc(db, `vaults/${vaultId}`), vaultData);
+    await setDoc(doc(db, `users/${currentUser.uid}/vaults/${vaultId}`), { name, createdAt: vaultData.createdAt });
+
+    const newVault = { ...vaultData, role:'owner', licenses:[] };
+    myVaults.push(newVault);
+
+    window._closeCreateVaultModal();
+    btn.disabled = false; btn.textContent = 'Create Vault';
+
+    // Directly set currentVault and enter — no array lookup needed
+    currentVault = newVault;
+    licenses = [];
+    activeFilter = 'all'; searchQuery = '';
+    settings = { email:'', intervals:[60,30,7] };
+
+    showScreen('vault');
+    document.getElementById('nav-crumb').style.display = 'flex';
+    document.getElementById('nav-vault-name').textContent = name;
+    document.getElementById('vault-title').innerHTML = `<span>${esc(name)}</span>`;
+    document.getElementById('vault-subtitle').textContent = vaultData.desc || 'Your personal vault';
+    document.getElementById('add-license-btn').style.display = 'flex';
+    document.getElementById('add-form').classList.remove('open');
+    document.getElementById('vault-members-panel').style.display = 'block';
+    document.getElementById('reminder-panel').style.display = 'block';
+    document.getElementById('search-input').value = '';
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter==='all'));
+    _updateReminderTriggerText();
+    _initReminderDropdown();
+    members = []; renderMembers();
+    render();
+    toast(`Vault "${name}" created!`);
+  } catch(e) {
+    btn.disabled = false; btn.textContent = 'Create Vault';
+    toast('Error creating vault: ' + e.message);
+  }
 };
 
 // ── Delete Vault ──────────────────────────────────────────────────────────
