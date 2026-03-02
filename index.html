@@ -2,7 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="re-newly">
+<meta name="theme-color" content="#6b5335" id="theme-color-meta">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
 <title>re-newly</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%236b5335'/%3E%3Ctext x='3' y='25' font-family='Georgia,serif' font-size='23' font-style='italic' font-weight='400' fill='%23faf6ef' letter-spacing='-1'%3Ere%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -22,7 +29,7 @@
   --danger:#c0524e; --warn:#c08040; --ok:#3d8f6a;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;transition:background .3s,color .3s;}
+body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;transition:background .3s,color .3s;padding-bottom:env(safe-area-inset-bottom);}
 
 /* LOADING */
 .loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;transition:opacity .3s ease;}
@@ -63,7 +70,7 @@ body{font-family:'Outfit',sans-serif;font-weight:400;background:var(--bg);color:
 .btn-full{width:100%;}
 
 /* NAV */
-.topnav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px;background:var(--surface);border-bottom:1px solid var(--border);}
+.topnav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 32px;padding-top:env(safe-area-inset-top);height:calc(60px + env(safe-area-inset-top));background:var(--surface);border-bottom:1px solid var(--border);}
 .nav-brand{display:flex;align-items:center;}
 .nav-right{display:flex;align-items:center;gap:12px;}
 .nav-vault-label{font-size:12px;color:var(--muted);font-weight:500;display:none;}
@@ -2244,8 +2251,10 @@ window._checkDuplicate = () => {
 // ── Dark Mode ─────────────────────────────────────────────────────────────
 window._toggleDark = () => {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  localStorage.setItem('rn-theme', isDark ? 'light' : 'dark');
+  const next = isDark ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('rn-theme', next);
+  document.getElementById('theme-color-meta')?.setAttribute('content', next === 'dark' ? '#1e1a14' : '#6b5335');
 };
 
 // Apply saved theme on load — light is default, dark only if explicitly chosen
@@ -2362,6 +2371,13 @@ window._toggleArchiveVault = async (vaultId, archive) => {
     toast(archive ? 'Vault archived.' : 'Vault unarchived.');
   } catch(e) { toast('Error: ' + e.message); }
 };
+
+// ── Service Worker ────────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
 
 // ── Auth enter key ────────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
